@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Стирка · Общежитие №7</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f5f6f8;color:#17181a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:680px;margin:auto;padding:20px 12px 50px}
+    h1{font-size:27px;margin:0 0 5px}
+    .sub{color:#72767d;margin:0 0 18px}
+    .days{display:flex;gap:8px;overflow:auto;padding-bottom:14px}
+    .day{border:1px solid #e1e4e8;background:white;border-radius:14px;padding:10px 13px;white-space:nowrap}
+    .day.on{background:#17181a;color:white}
+    .legend{font-size:14px;color:#72767d;margin:0 0 14px}
+    .legend span{margin-right:15px}
+    .slot{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:15px;margin-bottom:11px;box-shadow:0 7px 22px rgba(0,0,0,.045)}
+    .time{font-size:19px;font-weight:750;margin-bottom:12px}
+    .machines{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+    .machine{border:0;border-radius:13px;min-height:53px;font-weight:750}
+    .free{background:#e8f8ee;color:#198c4b}
+    .busy{background:#fbeaea;color:#ca4242}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.43);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+    .modal{background:white;width:min(100%,560px);border-radius:24px;padding:20px}
+    .modal h2{margin:0 0 5px}
+    .meta{color:#72767d;margin-bottom:16px}
+    label{display:block;margin:11px 0 5px;color:#666;font-size:14px}
+    input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:16px}
+    .actions{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:16px}
+    .btn{border:0;border-radius:13px;padding:13px;font-weight:700}
+    .cancel{background:#eef0f2}
+    .book{background:#1769da;color:white}
+    .err{color:#c63d3d;font-size:14px;margin-top:10px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Стирка · Общежитие №7</h1>
+  <p class="sub">Выберите время, затем свободную машинку</p>
+
+  <div id="days" class="days"></div>
+  <div class="legend"><span>🟢 свободно</span><span>🔴 занято</span></div>
+  <div id="schedule"></div>
+</main>
+
+<div id="modalRoot"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    doc,
+    onSnapshot,
+    query,
+    runTransaction,
+    where
+  } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDForvSsN1cMgEtHNFUIXTUmua3XTl6Lys",
+    authDomain: "laundry-7.firebaseapp.com",
+    projectId: "laundry-7",
+    storageBucket: "laundry-7.firebasestorage.app",
+    messagingSenderId: "765868065792",
+    appId: "1:765868065792:web:1c30e2b1b9d67afaeff84e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const times = ["07:00","09:00","11:00","13:00","15:00","17:00","19:00","21:00"];
+
+  const dateKey = d =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+  const endTime = t => `${String(Number(t.slice(0,2))+2).padStart(2,"0")}:00`;
+
+  const slotId = (d,t,m) => `${d}_${t.replace(":","")}_m${m}`;
+
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date();
+    d.setHours(12,0,0,0);
+    d.setDate(d.getDate()+i);
+    return d;
+  });
+
+  let selectedDate = dateKey(days[0]);
+  let bookings = [];
+  let unsubscribe = null;
+
+  const daysEl = document.getElementById("days");
+  const scheduleEl = document.getElementById("schedule");
+  const modalRoot = document.getElementById("modalRoot");
+
+  function renderDays(){
+    daysEl.innerHTML = "";
+    days.forEach((d,i)=>{
+      const btn = document.createElement("button");
+      btn.className = "day" + (dateKey(d)===selectedDate ? " on" : "");
+      const label = i===0 ? "Сегодня" : i===1 ? "Завтра" : d.toLocaleDateString("ru-RU",{weekday:"short"});
+      btn.textContent = `${label} · ${d.getDate()} ${d.toLocaleDateString("ru-RU",{month:"short"})}`;
+      btn.onclick = () => {
+        selectedDate = dateKey(d);
+        renderDays();
+        subscribeBookings();
+      };
+      daysEl.appendChild(btn);
+    });
+  }
+
+  function isBusy(machine, time){
+    return bookings.some(b => b.machine_number===machine && b.start_time===time);
+  }
+
+  function renderSchedule(){
+    scheduleEl.innerHTML = "";
+    times.forEach(time=>{
+      const section = document.createElement("section");
+      section.className = "slot";
+
+      const title = document.createElement("div");
+      title.className = "time";
+      title.textContent = `${time}–${endTime(time)}`;
+      section.appendChild(title);
+
+      const machines = document.createElement("div");
+      machines.className = "machines";
+
+      [1,2,3,4,5].forEach(machine=>{
+        const busy = isBusy(machine,time);
+        const btn = document.createElement("button");
+        btn.className = "machine " + (busy ? "busy" : "free");
+        btn.textContent = `№${machine}`;
+        btn.disabled = busy;
+        if(!busy) btn.onclick = () => openModal(machine,time);
+        machines.appendChild(btn);
+      });
+
+      section.appendChild(machines);
+      scheduleEl.appendChild(section);
+    });
+  }
+
+  function subscribeBookings(){
+    if(unsubscribe) unsubscribe();
+    const q = query(collection(db,"bookings"), where("booking_date","==",selectedDate));
+    unsubscribe = onSnapshot(q, snap => {
+      bookings = snap.docs.map(d => ({id:d.id,...d.data()}));
+      renderSchedule();
+    });
+  }
+
+  function openModal(machine,time){
+    modalRoot.innerHTML = `
+      <div class="overlay" id="overlay">
+        <div class="modal">
+          <h2>Машинка №${machine}</h2>
+          <div class="meta">
+            ${new Date(selectedDate+"T12:00").toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
+            · ${time}–${endTime(time)}
+          </div>
+          <label>Имя</label>
+          <input id="name" placeholder="Ваше имя" />
+          <label>Комната</label>
+          <input id="room" placeholder="Например, 1407" />
+          <div id="error" class="err"></div>
+          <div class="actions">
+            <button class="btn cancel" id="cancelBtn">Отмена</button>
+            <button class="btn book" id="bookBtn">Забронировать</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("cancelBtn").onclick = () => modalRoot.innerHTML = "";
+    document.getElementById("overlay").onclick = e => {
+      if(e.target.id === "overlay") modalRoot.innerHTML = "";
+    };
+
+    document.getElementById("bookBtn").onclick = async () => {
+      const name = document.getElementById("name").value.trim();
+      const room = document.getElementById("room").value.trim();
+      const error = document.getElementById("error");
+      const btn = document.getElementById("bookBtn");
+
+      error.textContent = "";
+      if(!name || !room){
+        error.textContent = "Введите имя и номер комнаты.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Сохраняю…";
+
+      try{
+        const ref = doc(db,"bookings",slotId(selectedDate,time,machine));
+        await runTransaction(db, async tr => {
+          const snap = await tr.get(ref);
+          if(snap.exists()) throw new Error("taken");
+          tr.set(ref,{
+            machine_number: machine,
+            booking_date: selectedDate,
+            start_time: time,
+            name,
+            room,
+            created_at: new Date().toISOString()
+          });
+        });
+
+        modalRoot.innerHTML = "";
+      }catch(e){
+        error.textContent = e?.message === "taken"
+          ? "Этот слот уже успели занять."
+          : "Не удалось записаться. Проверьте Firestore Rules.";
+        btn.disabled = false;
+        btn.textContent = "Забронировать";
+      }
+    };
+  }
+
+  renderDays();
+  subscribeBookings();
+</script>
+</body>
+</html>
