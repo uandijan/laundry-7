@@ -2070,10 +2070,59 @@ body.module-brs #bottom .brs-nav.active{
 #pullRefresh .pr-spinner{width:20px;height:20px;border:2.5px solid rgba(22,135,255,.22);border-top-color:currentColor;border-radius:50%;transform:rotate(0deg)}
 #pullRefresh.loading .pr-spinner{animation:prSpin .7s linear infinite}
 @keyframes prSpin{to{transform:rotate(360deg)}}
+/* Motion polish */
+@keyframes riseIn{
+  from{opacity:0;transform:translate3d(0,14px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes navIn{
+  from{opacity:0;transform:translate3d(-50%,18px,0)}
+  to{opacity:1;transform:translate3d(-50%,0,0)}
+}
+@keyframes toastIn{
+  from{opacity:0;transform:translate3d(-50%,-10px,0) scale(.97)}
+  to{opacity:1;transform:translate3d(-50%,0,0) scale(1)}
+}
+@keyframes selectedGlow{
+  from{box-shadow:0 0 0 0 rgba(10,132,255,.28)}
+  to{box-shadow:0 0 0 5px rgba(10,132,255,0)}
+}
+
+.bottom{animation:navIn .48s .1s cubic-bezier(.22,1,.36,1) both!important}
+.page-enter{animation:riseIn .34s cubic-bezier(.22,1,.36,1) both}
+.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2){animation:riseIn .42s .045s cubic-bezier(.22,1,.36,1) both}
+.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3){animation:riseIn .44s .09s cubic-bezier(.22,1,.36,1) both}
+.auth-wrap{animation:riseIn .5s cubic-bezier(.22,1,.36,1) both}
+.date-chip{transition:transform .24s cubic-bezier(.22,1,.36,1),box-shadow .24s ease,background .24s ease!important}
+.date-chip.active{animation:selectedGlow .38s ease-out}
+.nav{transition:transform .2s cubic-bezier(.22,1,.36,1),background .24s ease,color .24s ease,box-shadow .24s ease!important}
+.nav .nav-icon{transition:transform .28s cubic-bezier(.22,1,.36,1)}
+.nav.active .nav-icon{transform:translateY(-2px) scale(1.08)}
+.primary,.secondary,.small,.pill,.multi-toggle,.multi-confirm,.brs-plus,.brs-minus{
+  transition:transform .2s cubic-bezier(.22,1,.36,1),box-shadow .2s ease,filter .2s ease!important
+}
+.toast:not(.hidden){animation:toastIn .28s cubic-bezier(.22,1,.36,1) both}
+.modal:not(.hidden){animation:fadeIn .24s ease-out both}
+.modal:not(.hidden) .sheet{animation:popIn .36s cubic-bezier(.22,1,.36,1) both}
+.input:focus-visible,button:focus-visible{outline:2px solid #1687ff;outline-offset:3px}
+
+@media (hover:hover){
+  .nav:not(.active):hover,.primary:hover,.secondary:hover,.small:hover,.multi-toggle:hover,.multi-confirm:hover,.brs-plus:hover,.brs-minus:hover{transform:translateY(-2px)}
+  .primary:hover,.multi-confirm:hover{filter:brightness(1.06);box-shadow:0 12px 28px rgba(10,132,255,.26)}
+  .slot:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 5px 13px rgba(28,84,128,.16)}
+}
+@media (prefers-reduced-motion:reduce){
+  .date-chip,.nav,.nav .nav-icon,.primary,.secondary,.small,.pill,
+  .multi-toggle,.multi-confirm,.brs-plus,.brs-minus{transition:none!important}
+  .bottom,.page-enter,.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2),
+  .page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3),.auth-wrap,.date-chip.active,
+  .toast:not(.hidden),.modal:not(.hidden),.modal:not(.hidden) .sheet{animation:none!important}
+  .bottom,.toast{transform:translateX(-50%)}
+}
 </style>
 </head>
 <body class="auth-pending">
-<div id="globalBg" aria-hidden="true"></div><div id="authBoot"><div class="auth-spinner"></div></div>
+<div id="globalBg" aria-hidden="true"></div><div id="authBoot"><div class="auth-spinner"></div></div><div id="pullRefresh" aria-hidden="true"><div class="pr-spinner"></div></div>
 <div id="toast" class="toast hidden"></div>
 <section id="authView" class="auth"><div class="auth-wrap"><div class="brand">CAMPUS KGMU</div><div class="hero">Общежитие №7</div><p class="muted">Единый портал общежития</p><div class="glass card"><div class="tabs"><button id="loginTab" class="tab active">Вход</button><button id="registerTab" class="tab">Регистрация</button></div><form id="loginForm"><label>Почта</label><input id="loginEmail" class="input" type="email" required><label>Пароль</label><input id="loginPassword" class="input" type="password" required><div style="height:14px"></div><button class="primary">Войти</button><div class="divider">или</div><button id="google1" class="secondary" type="button">Продолжить с Google</button><p style="text-align:center"><a id="reset" href="#" style="color:#82c5ff">Забыли пароль?</a></p></form><form id="registerForm" class="hidden"><label>ФИО</label><input id="regName" class="input" required><label>Комната</label><input id="regRoom" class="input" placeholder="Например, 2.3.1" type="text" inputmode="text" autocomplete="off" required><label>Телефон</label><input id="regPhone" class="input" type="tel" placeholder="+7 900 123-45-67" required><label>Почта</label><input id="regEmail" class="input" type="email" required><label>Пароль</label><input id="regPassword" class="input" type="password" minlength="6" required><div style="height:14px"></div><button class="primary">Зарегистрироваться</button><div class="divider">или</div><button id="google2" class="secondary" type="button">Продолжить с Google</button></form></div></div></section>
 <section id="appView" class="hidden"><header class="topbar"><div class="top-inner"><button id="moduleBrand" class="mini-brand module-brand" type="button"><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.08"><span style="font-size:12px;font-weight:900;letter-spacing:.04em">CAMPUS KGMU</span><span style="font-size:10px;font-weight:700;opacity:.68">Общежитие №7 · <span id="moduleName">Стирка</span></span></span><span class="module-chevron">⌄</span></button><div id="moduleMenu" class="glass module-menu hidden"><button data-module="laundry"><span>🧺 Стирка</span><b id="laundryCheck">✓</b></button><button id="brsModuleOption" data-module="brs" class="hidden"><span>📊 БРС <i>BETA</i></span><b id="brsCheck"></b></button></div><button id="accountChip" class="user-chip" type="button"><div id="avatar" class="avatar">U</div><div><div id="topName" style="font-size:12px;font-weight:800">Пользователь</div><div id="topRole" style="font-size:11px;color:var(--muted)">Профиль</div></div></button><div id="accountMenu" class="glass account-menu hidden"><button id="accountProfile" type="button">👤 Профиль</button><button id="accountUsers" class="hidden" type="button">👥 База жильцов</button><button id="accountBrsRating" class="hidden" type="button">🏆 Рейтинг БРС</button></div></div></header><main class="app"><section id="schedulePage"><div class="welcome"><h1 id="hello">Добрый день!</h1><p>Стирка · выбери удобное время</p></div><div id="dates" class="dates"></div><div class="glass schedule-card"><div class="multi-tools"><button id="multiToggle" class="multi-toggle" type="button">Выбрать несколько</button><span id="multiNote" class="multi-note hidden">Выбрано: <b id="multiCount">0</b></span><button id="multiConfirm" class="multi-confirm hidden" type="button" disabled>Забронировать</button></div><div id="scheduleGrid" class="grid-wrap"><div class="loader">Загружаем расписание…</div></div><div class="legend"><span><i class="dot" style="background:var(--green)"></i>Свободно</span><span><i class="dot" style="background:var(--blue)"></i>Моя запись</span><span><i class="dot" style="background:var(--red)"></i>Занято</span><span><i class="dot" style="background:var(--gray)"></i>Недоступно</span></div></div></section><section id="myPage" class="hidden"><div class="title">Мои записи</div><div id="myBookings"></div></section><section id="profilePage" class="hidden"><div class="title">Профиль</div><div class="glass item"><div class="profile-head"><div class="profile-avatar">👤</div><div><div id="profileName" class="profile-name"></div><div id="profileMeta" class="meta"></div><div id="profileRole" class="meta"></div></div></div></div><div class="glass item"><div class="menu"><span>Имя</span><b id="pName"></b></div><div class="menu"><span>Комната</span><b id="pRoom"></b></div><div class="menu"><span>Телефон</span><b id="pPhone"></b></div><div class="menu"><span>Почта</span><b id="pEmail"></b></div></div><button id="editProfile" class="secondary">Изменить данные</button><div style="height:9px"></div><button id="logout" class="secondary danger">Выйти</button></section><section id="adminPage" class="hidden"><div class="title">База жильцов</div><div class="admin-tabs"><button class="pill active" data-admin="users">Пользователи</button><button class="pill" data-admin="history">История</button></div><div id="adminUserTools"><div class="admin-stats"><div class="glass stat-card"><span>Всего</span><b id="statTotal">0</b></div><div class="glass stat-card"><span>Жителей</span><b id="statResidents">0</b></div><div class="glass stat-card"><span>Студсовет</span><b id="statCouncil">0</b></div></div><div class="glass admin-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="adminUserSearch" type="search" placeholder="Поиск по имени, комнате, телефону или почте" autocomplete="off"><button id="clearAdminSearch" class="search-clear hidden" type="button" aria-label="Очистить поиск">×</button></div></div><div id="adminUsers"></div><div id="adminHistory" class="hidden"></div></section><section id="brsRatingPage" class="hidden">
@@ -2723,7 +2772,7 @@ $("#exportBrsRatingExcel").onclick=exportAdminBrsRatingExcel;
 $("#brsRatingSearch").oninput=renderAdminBrsRating;
 $("#clearBrsRatingSearch").onclick=()=>{$("#brsRatingSearch").value="";renderAdminBrsRating();$("#brsRatingSearch").focus()};
 
-function brsPage(n){$("#brsRatingPage")?.classList.add("hidden");$("#bottom").classList.remove("hidden");$$(".brs-page").forEach(x=>x.classList.add("hidden"));$("#brs"+n[0].toUpperCase()+n.slice(1)+"Page").classList.remove("hidden");$$(".brs-nav").forEach(x=>x.classList.toggle("active",x.dataset.brsPage===n));if(n==="home")renderBrsHome();if(n==="history")renderBrsHistory();if(n==="operation")renderBrsOperation();if(n==="manage")renderBrsManage();}
+function brsPage(n){$("#brsRatingPage")?.classList.add("hidden");$("#bottom").classList.remove("hidden");$$(".brs-page").forEach(x=>x.classList.add("hidden"));const target=$("#brs"+n[0].toUpperCase()+n.slice(1)+"Page");target.classList.remove("hidden","page-enter");void target.offsetWidth;target.classList.add("page-enter");$$(".brs-nav").forEach(x=>x.classList.toggle("active",x.dataset.brsPage===n));if(n==="home")renderBrsHome();if(n==="history")renderBrsHistory();if(n==="operation")renderBrsOperation();if(n==="manage")renderBrsManage();}
 $$('.brs-nav').forEach(x=>x.onclick=()=>brsPage(x.dataset.brsPage));
 async function getBrsUsers(){if(brsUsers.length)return brsUsers;const s=await getDocs(collection(db,"users"));brsUsers=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ru"));return brsUsers}
 async function getPublicTxFor(uid){const s=await getDocs(query(collection(db,"brs_transactions"),where("student_uid","==",uid)));return s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0))}
