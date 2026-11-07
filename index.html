@@ -2070,54 +2070,164 @@ body.module-brs #bottom .brs-nav.active{
 #pullRefresh .pr-spinner{width:20px;height:20px;border:2.5px solid rgba(22,135,255,.22);border-top-color:currentColor;border-radius:50%;transform:rotate(0deg)}
 #pullRefresh.loading .pr-spinner{animation:prSpin .7s linear infinite}
 @keyframes prSpin{to{transform:rotate(360deg)}}
-/* Motion polish */
-@keyframes riseIn{
-  from{opacity:0;transform:translate3d(0,14px,0)}
+/* Visual refinement */
+html,body{font-family:-apple-system,BlinkMacSystemFont,Inter,"Segoe UI",sans-serif}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+#globalBg{filter:saturate(.86) contrast(.97)}
+#globalBg::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(225,240,251,.25),rgba(229,243,253,.12) 35%,rgba(207,229,245,.28));
+}
+.auth .card{
+  background:linear-gradient(145deg,rgba(251,254,255,.88),rgba(235,246,253,.81))!important;
+  border:1px solid rgba(255,255,255,.96)!important;
+  box-shadow:0 24px 60px rgba(32,69,104,.19),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.auth .brand{font-weight:760!important;letter-spacing:-.035em}
+.auth .hero{font-weight:760!important;letter-spacing:-.045em!important}
+.auth label{color:#456583!important;font-weight:650;letter-spacing:.01em}
+.auth .input{
+  background:rgba(255,255,255,.82)!important;
+  border-color:rgba(104,145,179,.23)!important;
+  box-shadow:inset 0 1px 2px rgba(31,68,102,.035);
+}
+.auth .tabs{background:rgba(211,228,241,.62)!important}
+.auth .tab{font-weight:700!important}
+.auth .primary{box-shadow:0 11px 24px rgba(10,132,255,.24),inset 0 1px 0 rgba(255,255,255,.25)!important}
+.glass{
+  background:linear-gradient(145deg,rgba(252,254,255,.91),rgba(238,247,253,.86))!important;
+  border-color:rgba(255,255,255,.96)!important;
+  box-shadow:0 16px 40px rgba(29,67,103,.17),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+.schedule-card,#profilePage .item,#adminPage .item,#myBookings .item,
+#adminHistory .item,.brs-hero,.brs-score,.brs-global,.brs-tx,
+.brs-page .item,.stat-card,.admin-search-wrap{
+  background:linear-gradient(145deg,rgba(252,254,255,.92),rgba(237,247,253,.88))!important;
+  border-color:rgba(255,255,255,.97)!important;
+}
+.date-chip,.machine,.brs-reason-row,.brs-mode-segment,
+.brs-permission-box,.brs-switch-row,.resident-result{
+  background:rgba(248,252,255,.85)!important;
+}
+.date-chip.active{background:linear-gradient(145deg,#1687ff,#58b3ff)!important}
+.bottom,.module-menu,.account-menu{
+  background:linear-gradient(145deg,rgba(252,254,255,.94),rgba(234,245,253,.91))!important;
+}
+.welcome h1,.title,.brs-hero h1{color:#163657!important;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.meta,.brs-meta,.brs-hero p{color:#526c83!important}
+.empty,.loader{color:#60758a!important}
+.welcome h1,.title,.brs-hero h1{font-weight:760!important;letter-spacing:-.035em!important}
+.item-title,.profile-name,.brs-score .who{font-weight:730!important;letter-spacing:-.018em}
+.mini-brand,.user-chip,.nav-label,.brs-mode-segment button,.brs-segment button,
+.brs-reason-row b,.module-menu button,.account-menu button{font-weight:700!important}
+.nav-label{font-size:11px!important;letter-spacing:.005em}
+.profile-avatar svg{width:29px;height:29px}
+.meta,.muted,.sheet p{line-height:1.45}
+.glass,.sheet{backdrop-filter:blur(24px) saturate(125%)!important;-webkit-backdrop-filter:blur(24px) saturate(125%)!important}
+.sheet{max-height:min(88dvh,850px);overflow-y:auto;overscroll-behavior:contain}
+
+/* Motion system */
+:root{
+  --motion-ease:cubic-bezier(.22,1,.36,1);
+  --motion-spring:cubic-bezier(.2,1.12,.32,1);
+}
+@keyframes motionPage{
+  from{opacity:0;transform:translate3d(0,15px,0) scale(.992)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes motionNav{
+  from{opacity:0;translate:0 18px}
+  to{opacity:1;translate:0 0}
+}
+@keyframes motionForm{
+  from{opacity:0;transform:translate3d(0,9px,0)}
   to{opacity:1;transform:translate3d(0,0,0)}
 }
-@keyframes navIn{
-  from{opacity:0;transform:translate3d(-50%,18px,0)}
-  to{opacity:1;transform:translate3d(-50%,0,0)}
+@keyframes motionMenu{
+  from{opacity:0;transform:translate3d(0,-7px,0) scale(.96)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
 }
-@keyframes toastIn{
-  from{opacity:0;transform:translate3d(-50%,-10px,0) scale(.97)}
+@keyframes motionSheet{
+  from{opacity:0;transform:translate3d(0,30px,0) scale(.985)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes motionToast{
+  from{opacity:0;transform:translate3d(-50%,-10px,0) scale(.96)}
   to{opacity:1;transform:translate3d(-50%,0,0) scale(1)}
 }
-@keyframes selectedGlow{
-  from{box-shadow:0 0 0 0 rgba(10,132,255,.28)}
-  to{box-shadow:0 0 0 5px rgba(10,132,255,0)}
+@keyframes motionIcon{
+  0%{transform:translateY(2px) scale(.88)}
+  65%{transform:translateY(-3px) scale(1.12)}
+  100%{transform:translateY(-2px) scale(1.06)}
 }
 
-.bottom{animation:navIn .48s .1s cubic-bezier(.22,1,.36,1) both!important}
-.page-enter{animation:riseIn .34s cubic-bezier(.22,1,.36,1) both}
-.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2){animation:riseIn .42s .045s cubic-bezier(.22,1,.36,1) both}
-.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3){animation:riseIn .44s .09s cubic-bezier(.22,1,.36,1) both}
-.auth-wrap{animation:riseIn .5s cubic-bezier(.22,1,.36,1) both}
-.date-chip{transition:transform .24s cubic-bezier(.22,1,.36,1),box-shadow .24s ease,background .24s ease!important}
-.date-chip.active{animation:selectedGlow .38s ease-out}
-.nav{transition:transform .2s cubic-bezier(.22,1,.36,1),background .24s ease,color .24s ease,box-shadow .24s ease!important}
-.nav .nav-icon{transition:transform .28s cubic-bezier(.22,1,.36,1)}
-.nav.active .nav-icon{transform:translateY(-2px) scale(1.08)}
-.primary,.secondary,.small,.pill,.multi-toggle,.multi-confirm,.brs-plus,.brs-minus{
-  transition:transform .2s cubic-bezier(.22,1,.36,1),box-shadow .2s ease,filter .2s ease!important
+/* Entrance and navigation */
+.auth-wrap{animation:motionPage .54s var(--motion-ease) both}
+#loginForm:not(.hidden),#registerForm:not(.hidden){animation:motionForm .32s var(--motion-ease) both}
+.bottom{animation:motionNav .48s .08s var(--motion-ease) both!important}
+.page-enter{animation:motionPage .38s var(--motion-ease) both}
+.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2){animation:motionPage .42s .045s var(--motion-ease) both}
+.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3){animation:motionPage .45s .09s var(--motion-ease) both}
+.module-menu:not(.hidden),.account-menu:not(.hidden){animation:motionMenu .26s var(--motion-spring) both;transform-origin:top left}
+.account-menu:not(.hidden){transform-origin:top right}
+.nav{transition:background .28s ease,color .25s ease,box-shadow .28s ease,transform .22s var(--motion-ease)!important}
+.nav.active .nav-icon{animation:motionIcon .38s var(--motion-spring) both}
+.nav .nav-label{transition:transform .24s var(--motion-ease),opacity .24s ease}
+.nav.active .nav-label{transform:translateY(-1px)}
+.tab,.pill,.brs-segment button,.brs-mode-segment button{
+  transition:background .28s ease,color .24s ease,box-shadow .28s ease,transform .22s var(--motion-ease)!important
 }
-.toast:not(.hidden){animation:toastIn .28s cubic-bezier(.22,1,.36,1) both}
-.modal:not(.hidden){animation:fadeIn .24s ease-out both}
-.modal:not(.hidden) .sheet{animation:popIn .36s cubic-bezier(.22,1,.36,1) both}
-.input:focus-visible,button:focus-visible{outline:2px solid #1687ff;outline-offset:3px}
+.date-chip{transition:transform .26s var(--motion-ease),box-shadow .28s ease,background .28s ease,color .25s ease!important}
+.slot{transition:transform .22s var(--motion-ease),box-shadow .25s ease,filter .22s ease,background .28s ease!important}
+.slot.multi-selected{box-shadow:0 0 0 3px rgba(10,132,255,.18),0 6px 16px rgba(10,132,255,.18)!important}
 
+/* Cards, controls, feedback */
+.primary,.secondary,.small,.multi-toggle,.multi-confirm,.brs-plus,.brs-minus,.resident-result,.brs-chip{
+  transition:transform .22s var(--motion-ease),box-shadow .26s ease,filter .22s ease,background .25s ease!important
+}
+button:not(:disabled):active{transform:scale(.965)}
+.nav:not(:disabled):active,.date-chip:not(:disabled):active,.slot:not(:disabled):active{transform:scale(.94)}
+.input,textarea,select{transition:border-color .24s ease,box-shadow .24s ease,background .24s ease!important}
+.input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:none!important;border-color:rgba(10,132,255,.7)!important;
+  box-shadow:0 0 0 4px rgba(10,132,255,.15)!important
+}
+button:focus-visible{outline:2px solid #1687ff;outline-offset:3px}
 @media (hover:hover){
-  .nav:not(.active):hover,.primary:hover,.secondary:hover,.small:hover,.multi-toggle:hover,.multi-confirm:hover,.brs-plus:hover,.brs-minus:hover{transform:translateY(-2px)}
-  .primary:hover,.multi-confirm:hover{filter:brightness(1.06);box-shadow:0 12px 28px rgba(10,132,255,.26)}
-  .slot:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 5px 13px rgba(28,84,128,.16)}
+  .primary:not(:disabled):hover,.secondary:not(:disabled):hover,.small:not(:disabled):hover,
+  .multi-toggle:not(:disabled):hover,.multi-confirm:not(:disabled):hover,
+  .brs-plus:not(:disabled):hover,.brs-minus:not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.04)}
+  .slot:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(28,84,128,.16)}
+  .nav:not(.active):hover,.pill:not(.active):hover,.brs-chip:not(.active):hover{transform:translateY(-2px)}
 }
+
+/* Floating surfaces */
+.modal:not(.hidden){animation:fadeIn .24s ease-out both}
+.modal:not(.hidden) .sheet{animation:motionSheet .42s var(--motion-spring) both}
+.toast:not(.hidden){animation:motionToast .34s var(--motion-spring) both}
+#pullRefresh{transition:transform .2s var(--motion-ease),opacity .2s ease}
+
+/* Keep the same readable glass density on Android, whose earlier rules are more specific. */
+html.is-android :is(.glass,.schedule-card,.date-chip,#myBookings .item,#profilePage .card,#adminPage .item,.admin-search-wrap,.stat-card,.bottom,.user-chip,#editProfile,#logout){
+  background:linear-gradient(145deg,rgba(252,254,255,.93),rgba(237,247,253,.88))!important;
+  border-color:rgba(255,255,255,.97)!important;
+}
+html.is-android .date-chip.active,
+html.is-android .nav.active{background:linear-gradient(145deg,#1687ff,#58b3ff)!important;color:#fff!important}
+html.is-android .profile-avatar{background:linear-gradient(145deg,#1687ff,#66bbff)!important}
+
 @media (prefers-reduced-motion:reduce){
-  .date-chip,.nav,.nav .nav-icon,.primary,.secondary,.small,.pill,
-  .multi-toggle,.multi-confirm,.brs-plus,.brs-minus{transition:none!important}
-  .bottom,.page-enter,.page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2),
-  .page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3),.auth-wrap,.date-chip.active,
-  .toast:not(.hidden),.modal:not(.hidden),.modal:not(.hidden) .sheet{animation:none!important}
-  .bottom,.toast{transform:translateX(-50%)}
+  .auth-wrap,#loginForm:not(.hidden),#registerForm:not(.hidden),.bottom,.page-enter,
+  .page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(2),
+  .page-enter > :is(.title,.item,.glass,.brs-hero):nth-child(3),
+  .module-menu:not(.hidden),.account-menu:not(.hidden),.nav.active .nav-icon,
+  .modal:not(.hidden),.modal:not(.hidden) .sheet,.toast:not(.hidden){animation:none!important}
+  .nav,.nav .nav-label,.tab,.pill,.brs-segment button,.brs-mode-segment button,
+  .date-chip,.slot,.primary,.secondary,.small,.multi-toggle,.multi-confirm,
+  .brs-plus,.brs-minus,.resident-result,.brs-chip,.input,textarea,select,#pullRefresh{transition:none!important}
+  .bottom{translate:none}
+  .toast{transform:translateX(-50%)}
 }
 </style>
 </head>
@@ -2125,7 +2235,7 @@ body.module-brs #bottom .brs-nav.active{
 <div id="globalBg" aria-hidden="true"></div><div id="authBoot"><div class="auth-spinner"></div></div><div id="pullRefresh" aria-hidden="true"><div class="pr-spinner"></div></div>
 <div id="toast" class="toast hidden"></div>
 <section id="authView" class="auth"><div class="auth-wrap"><div class="brand">CAMPUS KGMU</div><div class="hero">Общежитие №7</div><p class="muted">Единый портал общежития</p><div class="glass card"><div class="tabs"><button id="loginTab" class="tab active">Вход</button><button id="registerTab" class="tab">Регистрация</button></div><form id="loginForm"><label>Почта</label><input id="loginEmail" class="input" type="email" required><label>Пароль</label><input id="loginPassword" class="input" type="password" required><div style="height:14px"></div><button class="primary">Войти</button><div class="divider">или</div><button id="google1" class="secondary" type="button">Продолжить с Google</button><p style="text-align:center"><a id="reset" href="#" style="color:#82c5ff">Забыли пароль?</a></p></form><form id="registerForm" class="hidden"><label>ФИО</label><input id="regName" class="input" required><label>Комната</label><input id="regRoom" class="input" placeholder="Например, 2.3.1" type="text" inputmode="text" autocomplete="off" required><label>Телефон</label><input id="regPhone" class="input" type="tel" placeholder="+7 900 123-45-67" required><label>Почта</label><input id="regEmail" class="input" type="email" required><label>Пароль</label><input id="regPassword" class="input" type="password" minlength="6" required><div style="height:14px"></div><button class="primary">Зарегистрироваться</button><div class="divider">или</div><button id="google2" class="secondary" type="button">Продолжить с Google</button></form></div></div></section>
-<section id="appView" class="hidden"><header class="topbar"><div class="top-inner"><button id="moduleBrand" class="mini-brand module-brand" type="button"><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.08"><span style="font-size:12px;font-weight:900;letter-spacing:.04em">CAMPUS KGMU</span><span style="font-size:10px;font-weight:700;opacity:.68">Общежитие №7 · <span id="moduleName">Стирка</span></span></span><span class="module-chevron">⌄</span></button><div id="moduleMenu" class="glass module-menu hidden"><button data-module="laundry"><span>🧺 Стирка</span><b id="laundryCheck">✓</b></button><button id="brsModuleOption" data-module="brs" class="hidden"><span>📊 БРС <i>BETA</i></span><b id="brsCheck"></b></button></div><button id="accountChip" class="user-chip" type="button"><div id="avatar" class="avatar">U</div><div><div id="topName" style="font-size:12px;font-weight:800">Пользователь</div><div id="topRole" style="font-size:11px;color:var(--muted)">Профиль</div></div></button><div id="accountMenu" class="glass account-menu hidden"><button id="accountProfile" type="button">👤 Профиль</button><button id="accountUsers" class="hidden" type="button">👥 База жильцов</button><button id="accountBrsRating" class="hidden" type="button">🏆 Рейтинг БРС</button></div></div></header><main class="app"><section id="schedulePage"><div class="welcome"><h1 id="hello">Добрый день!</h1><p>Стирка · выбери удобное время</p></div><div id="dates" class="dates"></div><div class="glass schedule-card"><div class="multi-tools"><button id="multiToggle" class="multi-toggle" type="button">Выбрать несколько</button><span id="multiNote" class="multi-note hidden">Выбрано: <b id="multiCount">0</b></span><button id="multiConfirm" class="multi-confirm hidden" type="button" disabled>Забронировать</button></div><div id="scheduleGrid" class="grid-wrap"><div class="loader">Загружаем расписание…</div></div><div class="legend"><span><i class="dot" style="background:var(--green)"></i>Свободно</span><span><i class="dot" style="background:var(--blue)"></i>Моя запись</span><span><i class="dot" style="background:var(--red)"></i>Занято</span><span><i class="dot" style="background:var(--gray)"></i>Недоступно</span></div></div></section><section id="myPage" class="hidden"><div class="title">Мои записи</div><div id="myBookings"></div></section><section id="profilePage" class="hidden"><div class="title">Профиль</div><div class="glass item"><div class="profile-head"><div class="profile-avatar">👤</div><div><div id="profileName" class="profile-name"></div><div id="profileMeta" class="meta"></div><div id="profileRole" class="meta"></div></div></div></div><div class="glass item"><div class="menu"><span>Имя</span><b id="pName"></b></div><div class="menu"><span>Комната</span><b id="pRoom"></b></div><div class="menu"><span>Телефон</span><b id="pPhone"></b></div><div class="menu"><span>Почта</span><b id="pEmail"></b></div></div><button id="editProfile" class="secondary">Изменить данные</button><div style="height:9px"></div><button id="logout" class="secondary danger">Выйти</button></section><section id="adminPage" class="hidden"><div class="title">База жильцов</div><div class="admin-tabs"><button class="pill active" data-admin="users">Пользователи</button><button class="pill" data-admin="history">История</button></div><div id="adminUserTools"><div class="admin-stats"><div class="glass stat-card"><span>Всего</span><b id="statTotal">0</b></div><div class="glass stat-card"><span>Жителей</span><b id="statResidents">0</b></div><div class="glass stat-card"><span>Студсовет</span><b id="statCouncil">0</b></div></div><div class="glass admin-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="adminUserSearch" type="search" placeholder="Поиск по имени, комнате, телефону или почте" autocomplete="off"><button id="clearAdminSearch" class="search-clear hidden" type="button" aria-label="Очистить поиск">×</button></div></div><div id="adminUsers"></div><div id="adminHistory" class="hidden"></div></section><section id="brsRatingPage" class="hidden">
+<section id="appView" class="hidden"><header class="topbar"><div class="top-inner"><button id="moduleBrand" class="mini-brand module-brand" type="button"><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.08"><span style="font-size:12px;font-weight:900;letter-spacing:.04em">CAMPUS KGMU</span><span style="font-size:10px;font-weight:700;opacity:.68">Общежитие №7 · <span id="moduleName">Стирка</span></span></span><span class="module-chevron">⌄</span></button><div id="moduleMenu" class="glass module-menu hidden"><button data-module="laundry"><span>🧺 Стирка</span><b id="laundryCheck">✓</b></button><button id="brsModuleOption" data-module="brs" class="hidden"><span>📊 БРС <i>BETA</i></span><b id="brsCheck"></b></button></div><button id="accountChip" class="user-chip" type="button"><div id="avatar" class="avatar">U</div><div><div id="topName" style="font-size:12px;font-weight:800">Пользователь</div><div id="topRole" style="font-size:11px;color:var(--muted)">Профиль</div></div></button><div id="accountMenu" class="glass account-menu hidden"><button id="accountProfile" type="button">👤 Профиль</button><button id="accountUsers" class="hidden" type="button">👥 База жильцов</button><button id="accountBrsRating" class="hidden" type="button">🏆 Рейтинг БРС</button></div></div></header><main class="app"><section id="schedulePage"><div class="welcome"><h1 id="hello">Добрый день!</h1><p>Выберите удобное время для стирки</p></div><div id="dates" class="dates"></div><div class="glass schedule-card"><div class="multi-tools"><button id="multiToggle" class="multi-toggle" type="button">Выбрать несколько</button><span id="multiNote" class="multi-note hidden">Выбрано: <b id="multiCount">0</b></span><button id="multiConfirm" class="multi-confirm hidden" type="button" disabled>Забронировать</button></div><div id="scheduleGrid" class="grid-wrap"><div class="loader">Загружаем расписание…</div></div><div class="legend"><span><i class="dot" style="background:var(--green)"></i>Свободно</span><span><i class="dot" style="background:var(--blue)"></i>Моя запись</span><span><i class="dot" style="background:var(--red)"></i>Занято</span><span><i class="dot" style="background:var(--gray)"></i>Недоступно</span></div></div></section><section id="myPage" class="hidden"><div class="title">Мои записи</div><div id="myBookings"></div></section><section id="profilePage" class="hidden"><div class="title">Профиль</div><div class="glass item"><div class="profile-head"><div class="profile-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></div><div><div id="profileName" class="profile-name"></div><div id="profileMeta" class="meta"></div><div id="profileRole" class="meta"></div></div></div></div><div class="glass item"><div class="menu"><span>Имя</span><b id="pName"></b></div><div class="menu"><span>Комната</span><b id="pRoom"></b></div><div class="menu"><span>Телефон</span><b id="pPhone"></b></div><div class="menu"><span>Почта</span><b id="pEmail"></b></div></div><button id="editProfile" class="secondary">Изменить данные</button><div style="height:9px"></div><button id="logout" class="secondary danger">Выйти</button></section><section id="adminPage" class="hidden"><div class="title">База жильцов</div><div class="admin-tabs"><button class="pill active" data-admin="users">Пользователи</button><button class="pill" data-admin="history">История</button></div><div id="adminUserTools"><div class="admin-stats"><div class="glass stat-card"><span>Всего</span><b id="statTotal">0</b></div><div class="glass stat-card"><span>Жителей</span><b id="statResidents">0</b></div><div class="glass stat-card"><span>Студсовет</span><b id="statCouncil">0</b></div></div><div class="glass admin-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="adminUserSearch" type="search" placeholder="Поиск по имени, комнате, телефону или почте" autocomplete="off"><button id="clearAdminSearch" class="search-clear hidden" type="button" aria-label="Очистить поиск">×</button></div></div><div id="adminUsers"></div><div id="adminHistory" class="hidden"></div></section><section id="brsRatingPage" class="hidden">
 <div class="title">Рейтинг БРС</div>
 <div class="glass brs-rating-search">
   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
@@ -2134,7 +2244,7 @@ body.module-brs #bottom .brs-nav.active{
 </div>
 <button id="exportBrsRatingExcel" class="secondary brs-excel-export" type="button">↗ Экспортировать рейтинг в Excel</button>
 <div id="brsRatingList"><div class="loader">Загружаем рейтинг…</div></div>
-</section><section id="brsHomePage" class="hidden brs-page"><div class="brs-hero glass"><div class="brs-beta">БРС общежития №7 · Beta</div><h1>Баллы решают 👀</h1><p>Заслуги замечаем. Нарушения тоже.</p></div><div id="brsPersonal"></div><div id="brsWork"></div></section><section id="brsHistoryPage" class="hidden brs-page"><div class="title">История БРС</div><div id="brsHistory"></div></section><section id="brsOperationPage" class="hidden brs-page"><div class="title">Операция</div><div id="brsOperation"></div></section><section id="brsManagePage" class="hidden brs-page"><div class="title">Управление БРС</div><div id="brsManage"></div></section></main><nav id="bottom" class="glass bottom"><button class="nav active laundry-nav" data-module-nav="laundry" data-page="schedule"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="my"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/><path d="M8 13h3M13 13h3M8 16h3"/></svg></span><span class="nav-label">Мои записи</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="profile"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span><span class="nav-label">Профиль</span></button><button id="adminNav" class="nav hidden laundry-nav" style="display:none!important" data-module-nav="laundry" data-page="admin"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.18.36.39.68.6 1 .3.46.8.72 1.35.72H21v4h-.1A1.7 1.7 0 0 0 19.4 15z"/></svg></span><span class="nav-label">Управление</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="home"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button id="brsOpNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="operation"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v14M3.5 7.5 7 4l3.5 3.5M17 20V6M13.5 16.5 17 20l3.5-3.5"/></svg></span><span class="nav-label">Операция</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="history"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="nav-label">История</span></button><button id="brsManageNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="manage"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.12-1.28l2-1.55-2-3.46-2.46 1a7 7 0 0 0-2.2-1.28L13.9 3h-4l-.32 2.43a7 7 0 0 0-2.2 1.28l-2.46-1-2 3.46 2 1.55A7 7 0 0 0 4.8 12c0 .44.04.87.12 1.28l-2 1.55 2 3.46 2.46-1a7 7 0 0 0 2.2 1.28L9.9 21h4l.32-2.43a7 7 0 0 0 2.2-1.28l2.46 1 2-3.46-2-1.55c.08-.41.12-.84.12-1.28z"/></svg></span><span class="nav-label">Управление</span></button></nav></section><div id="modal" class="modal hidden"><div id="sheet" class="sheet"></div></div>
+</section><section id="brsHomePage" class="hidden brs-page"><div class="brs-hero glass"><div class="brs-beta">БРС общежития №7 · Beta</div><h1>Ваши баллы</h1><p>Достижения и история баллов в одном месте.</p></div><div id="brsPersonal"></div><div id="brsWork"></div></section><section id="brsHistoryPage" class="hidden brs-page"><div class="title">История БРС</div><div id="brsHistory"></div></section><section id="brsOperationPage" class="hidden brs-page"><div class="title">Операция</div><div id="brsOperation"></div></section><section id="brsManagePage" class="hidden brs-page"><div class="title">Управление БРС</div><div id="brsManage"></div></section></main><nav id="bottom" class="glass bottom"><button class="nav active laundry-nav" data-module-nav="laundry" data-page="schedule"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="my"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/><path d="M8 13h3M13 13h3M8 16h3"/></svg></span><span class="nav-label">Мои записи</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="profile"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span><span class="nav-label">Профиль</span></button><button id="adminNav" class="nav hidden laundry-nav" style="display:none!important" data-module-nav="laundry" data-page="admin"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.18.36.39.68.6 1 .3.46.8.72 1.35.72H21v4h-.1A1.7 1.7 0 0 0 19.4 15z"/></svg></span><span class="nav-label">Управление</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="home"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button id="brsOpNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="operation"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v14M3.5 7.5 7 4l3.5 3.5M17 20V6M13.5 16.5 17 20l3.5-3.5"/></svg></span><span class="nav-label">Операция</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="history"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="nav-label">История</span></button><button id="brsManageNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="manage"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.12-1.28l2-1.55-2-3.46-2.46 1a7 7 0 0 0-2.2-1.28L13.9 3h-4l-.32 2.43a7 7 0 0 0-2.2 1.28l-2.46-1-2 3.46 2 1.55A7 7 0 0 0 4.8 12c0 .44.04.87.12 1.28l-2 1.55 2 3.46 2.46-1a7 7 0 0 0 2.2 1.28L9.9 21h4l.32-2.43a7 7 0 0 0 2.2-1.28l2.46 1 2-3.46-2-1.55c.08-.41.12-.84.12-1.28z"/></svg></span><span class="nav-label">Управление</span></button></nav></section><div id="modal" class="modal hidden"><div id="sheet" class="sheet"></div></div>
 <script>
   if (/Android/i.test(navigator.userAgent)) {
     document.documentElement.classList.add("is-android");
@@ -2165,7 +2275,7 @@ $("#bottom").style.gridTemplateColumns="repeat(3,minmax(0,1fr))";
 if(!isAdmin && !$("#adminPage").classList.contains("hidden")) page("schedule");
 }
 $("#editProfile").onclick=()=>{$("#modal").classList.remove("hidden");$("#sheet").innerHTML=`<h2>Личные данные</h2><label>ФИО</label><input id="eName" class="input" value="${esc(profile.name)}"><label>Комната</label><input id="eRoom" class="input" value="${esc(profile.room)}" placeholder="3.3.1" type="text" inputmode="text" autocomplete="off"><div class="profile-hint">Формат: этаж.блок.комната. Например, 3.3.1.</div><label>Телефон</label><input id="ePhone" class="input" value="${esc(profile.phone)}"><div class="sheet-actions"><button id="eCancel" class="secondary">Отмена</button><button id="eSave" class="primary">Сохранить</button></div>`;$("#eCancel").onclick=close;$("#eSave").onclick=async()=>{const name=$("#eName").value.trim(),room=$("#eRoom").value.trim(),phone=$("#ePhone").value.trim();if(!name||!room||!phone)return toast("Заполни все поля");if(!validRoom(room))return toast(roomError(room));await updateDoc(doc(db,"users",me.uid),{name,room,phone,profile_version:2,updated_at:serverTimestamp()});profile={...profile,name,room,phone,profile_version:2};renderProfile();close();toast("Профиль обновлён")}};
-function renderDates(){const ds=allowedDates();if(!selectedDate||!ds.includes(selectedDate))selectedDate=ds[0];$("#dates").innerHTML=ds.map(s=>{const d=dateFrom(s),w=new Intl.DateTimeFormat("ru-RU",{weekday:"short"}).format(d).replace(".","");return`<button class="date-chip ${s===selectedDate?"active":""}" data-date="${s}"><small>${w}</small><b>${d.getDate()}</b></button>`}).join("");$$('.date-chip').forEach(b=>b.onclick=()=>{selectedDate=b.dataset.date;multiSelected.clear();renderDates();watch()})}let badgeUsersCache=[];
+function renderDates(){const ds=allowedDates();if(!selectedDate||!ds.includes(selectedDate))selectedDate=ds[0];$("#dates").innerHTML=ds.map(s=>{const d=dateFrom(s),w=new Intl.DateTimeFormat("ru-RU",{weekday:"short"}).format(d).replace(".","");return`<button class="date-chip ${s===selectedDate?"active":""}" data-date="${s}"><small>${w}</small><b>${d.getDate()}</b></button>`}).join("");$$('.date-chip').forEach(b=>b.onclick=()=>{selectedDate=b.dataset.date;multiSelected.clear();$$('.date-chip').forEach(chip=>chip.classList.toggle('active',chip===b));watch()})}let badgeUsersCache=[];
 async function ensureBadgeUsers(){
   if(badgeUsersCache.length)return;
   try{const s=await getDocs(collection(db,"users"));badgeUsersCache=s.docs.map(d=>({id:d.id,...d.data()}))}
@@ -2538,6 +2648,7 @@ $$('[data-admin]').forEach(x=>x.onclick=()=>{
   for(const id of['schedule','my','profile','admin'])$(`#${id}Page`).classList.add('hidden');
   const target=$(`#${n}Page`);
   target.classList.remove('hidden');
+  window.scrollTo(0,0);
   target.classList.remove('page-enter');
   void target.offsetWidth;
   target.classList.add('page-enter');
@@ -2772,7 +2883,7 @@ $("#exportBrsRatingExcel").onclick=exportAdminBrsRatingExcel;
 $("#brsRatingSearch").oninput=renderAdminBrsRating;
 $("#clearBrsRatingSearch").onclick=()=>{$("#brsRatingSearch").value="";renderAdminBrsRating();$("#brsRatingSearch").focus()};
 
-function brsPage(n){$("#brsRatingPage")?.classList.add("hidden");$("#bottom").classList.remove("hidden");$$(".brs-page").forEach(x=>x.classList.add("hidden"));const target=$("#brs"+n[0].toUpperCase()+n.slice(1)+"Page");target.classList.remove("hidden","page-enter");void target.offsetWidth;target.classList.add("page-enter");$$(".brs-nav").forEach(x=>x.classList.toggle("active",x.dataset.brsPage===n));if(n==="home")renderBrsHome();if(n==="history")renderBrsHistory();if(n==="operation")renderBrsOperation();if(n==="manage")renderBrsManage();}
+function brsPage(n){$("#brsRatingPage")?.classList.add("hidden");$("#bottom").classList.remove("hidden");$$(".brs-page").forEach(x=>x.classList.add("hidden"));const target=$("#brs"+n[0].toUpperCase()+n.slice(1)+"Page");target.classList.remove("hidden","page-enter");window.scrollTo(0,0);void target.offsetWidth;target.classList.add("page-enter");$$(".brs-nav").forEach(x=>x.classList.toggle("active",x.dataset.brsPage===n));if(n==="home")renderBrsHome();if(n==="history")renderBrsHistory();if(n==="operation")renderBrsOperation();if(n==="manage")renderBrsManage();}
 $$('.brs-nav').forEach(x=>x.onclick=()=>brsPage(x.dataset.brsPage));
 async function getBrsUsers(){if(brsUsers.length)return brsUsers;const s=await getDocs(collection(db,"users"));brsUsers=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ru"));return brsUsers}
 async function getPublicTxFor(uid){const s=await getDocs(query(collection(db,"brs_transactions"),where("student_uid","==",uid)));return s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0))}
@@ -2799,6 +2910,28 @@ async function setBrsAccess(uid,access,manage){const data={brs_access:!!access,u
 if($("#multiToggle"))$("#multiToggle").onclick=()=>{multiMode=!multiMode;if(!multiMode)multiSelected.clear();updateMultiUi();watch()};
 if($("#multiConfirm"))$("#multiConfirm").onclick=saveMultipleBookings;
 setInterval(()=>{if(me&&selectedDate){renderDates();watch()}},60000);
+
+// Reveal newly loaded content without animating every cell in the schedule.
+const motionPreference=window.matchMedia("(prefers-reduced-motion: reduce)");
+for(const id of ["scheduleGrid","myBookings","adminUsers","adminHistory","brsPersonal","brsWork","brsHistory","brsOperation","brsManage","brsRatingList"]){
+  const container=document.getElementById(id);
+  if(!container)continue;
+  new MutationObserver(records=>{
+    if(motionPreference.matches||document.hidden||!container.getClientRects().length)return;
+    if(id==="scheduleGrid"&&multiMode)return;
+    const items=records.flatMap(record=>[...record.addedNodes])
+      .filter(node=>node.nodeType===Node.ELEMENT_NODE&&!node.classList.contains("loader"))
+      .slice(0,7);
+    if(!items.length)return;
+    requestAnimationFrame(()=>items.forEach((item,index)=>{
+      if(!item.isConnected||!item.getClientRects().length||!item.animate)return;
+      item.animate([
+        {opacity:0,transform:"translateY(12px) scale(.988)"},
+        {opacity:1,transform:"translateY(0) scale(1)"}
+      ],{duration:360,delay:index*35,easing:"cubic-bezier(.22,1,.36,1)",fill:"backwards"});
+    }));
+  }).observe(container,{childList:true});
+}
 
 // Pull-to-refresh for mobile browsers / home-screen mode.
 (()=>{
