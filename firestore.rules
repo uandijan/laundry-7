@@ -36,9 +36,9 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow get: if signedIn() && (
-        request.auth.uid == uid || canViewStudents() || canViewBrs() || brsManager()
+        request.auth.uid == uid || canViewStudents() || brsManager()
       );
-      allow list: if canViewStudents() || canViewBrs() || brsManager();
+      allow list: if canViewStudents() || brsManager();
       allow create: if signedIn()
         && request.auth.uid == uid
         && request.resource.data.role == 'resident'
@@ -105,7 +105,7 @@ service cloud.firestore {
     }
     match /brs_transactions/{txId} {
       allow read: if signedIn() && (
-        isAdmin() || canViewBrs() || resource.data.student_uid == request.auth.uid
+        isAdmin() || resource.data.student_uid == request.auth.uid
       );
       allow create: if brsManager()
         && !request.resource.data.keys().hasAny(['created_by', 'created_by_name']);
@@ -118,6 +118,43 @@ service cloud.firestore {
         ])
         && request.resource.data.cancelled == true
         && request.resource.data.cancelled_by == request.auth.uid
+      );
+      allow delete: if false;
+    }
+    match /brs_profiles/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || canViewBrs());
+      allow create, update: if isAdmin() || (
+        signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'room', 'account_verified'])
+        && request.resource.data.name == getAfter(/databases/$(database)/documents/users/$(uid)).data.name
+        && request.resource.data.room == getAfter(/databases/$(database)/documents/users/$(uid)).data.room
+        && request.resource.data.account_verified == getAfter(/databases/$(database)/documents/users/$(uid)).data.get('account_verified', false)
+      ) || (
+        canViewStudents() && request.auth.uid != uid
+        && request.resource.data.keys().hasOnly(['name', 'room', 'account_verified'])
+        && request.resource.data.name == getAfter(/databases/$(database)/documents/users/$(uid)).data.name
+        && request.resource.data.room == getAfter(/databases/$(database)/documents/users/$(uid)).data.room
+        && request.resource.data.account_verified == getAfter(/databases/$(database)/documents/users/$(uid)).data.get('account_verified', false)
+        && (!exists(/databases/$(database)/documents/brs_profiles/$(uid))
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['account_verified']))
+      );
+      allow delete: if isAdmin();
+    }
+    match /brs_view/{txId} {
+      allow read: if canViewBrs();
+      allow create: if brsManager()
+        && request.resource.data.keys().hasOnly([
+          'student_uid', 'student_name', 'student_room', 'points',
+          'reason_name', 'created_date', 'created_label', 'created_ms', 'cancelled'
+        ])
+        && request.resource.data.keys().hasAll([
+          'student_uid', 'student_name', 'student_room', 'points',
+          'reason_name', 'created_date', 'created_label', 'created_ms', 'cancelled'
+        ]);
+      allow update: if isAdmin() || (
+        brsCanceller() && ownManagerCopy(txId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelled'])
+        && request.resource.data.cancelled == true
       );
       allow delete: if false;
     }
