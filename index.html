@@ -2262,7 +2262,17 @@ html.is-android .profile-avatar{background:linear-gradient(145deg,#1687ff,#66bbf
   .toast{transform:translateX(-50%)}
 }
 #adminVerifiedFilter{width:100%;margin:0 0 12px;border-radius:15px;min-height:46px}
-.admin-user .item-title .status{display:inline-block;margin:5px 0 0 6px;font-size:11px;vertical-align:middle}
+.user-card-main{min-width:0}
+#adminPage .verification-badge,.user-detail-head .verification-badge{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin:0 0 8px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:850;line-height:1.2;color:#fff;border:1px solid rgba(255,255,255,.65);text-shadow:none}
+#adminPage .verification-badge.is-verified,.user-detail-head .verification-badge.is-verified{background:linear-gradient(135deg,#12985b,#24bd78)!important;box-shadow:0 5px 13px rgba(18,152,91,.18)!important}
+#adminPage .verification-badge.is-unverified,.user-detail-head .verification-badge.is-unverified{background:linear-gradient(135deg,#da4255,#f16970)!important;box-shadow:0 5px 13px rgba(218,66,85,.18)!important}
+#adminPage .user-role-badge{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:850;color:#fff;text-shadow:none}
+#adminPage .user-role-badge.role-resident{background:linear-gradient(135deg,#356bd4,#6998ee);box-shadow:0 5px 13px rgba(53,107,212,.17)}
+#adminPage .user-role-badge.role-student_council{background:linear-gradient(135deg,#8150ca,#ae78e5);box-shadow:0 5px 13px rgba(129,80,202,.17)}
+#adminPage .user-role-badge.role-admin{background:linear-gradient(135deg,#657287,#8996a9)}
+.user-detail-head .user-detail-role.role-resident{background:linear-gradient(135deg,#356bd4,#6998ee)}
+.user-detail-head .user-detail-role.role-student_council{background:linear-gradient(135deg,#8150ca,#ae78e5)}
+.user-detail-head .user-detail-role.role-admin{background:linear-gradient(135deg,#657287,#8996a9)}
 </style>
 </head>
 <body class="auth-pending">
@@ -2524,14 +2534,15 @@ function renderAdminUsers(){
     ? visible.map(u=>`
       <div class="glass item admin-user user-card-clickable" data-user-card="${u.id}">
         <div class="user-card-main">
-          <div class="item-title">${esc(u.name||"Без имени")}${u.id!==me.uid&&u.resident_badge?` <span class="resident-badge-inline">${esc(u.resident_badge)}</span>`:""} <span class="status">${u.account_verified===true?"✓ Подтверждён":"Не подтверждён"}</span></div>
+          <span class="verification-badge ${u.account_verified===true?"is-verified":"is-unverified"}">${u.account_verified===true?"✓ Подтверждён":"Не подтверждён"}</span>
+          <div class="item-title">${esc(u.name||"Без имени")}${u.id!==me.uid&&u.resident_badge?` <span class="resident-badge-inline">${esc(u.resident_badge)}</span>`:""}</div>
           <div class="meta">
             Комната ${esc(u.room||"—")} · ${esc(u.phone||"—")}<br>
             ${esc(u.email||"")}
           </div>
         </div>
         ${profile.role!=="admin"||u.id===me.uid
-          ? `<span class="status">${role(u.role)}</span>`
+          ? `<span class="user-role-badge role-${esc(u.role||"resident")}">${role(u.role)}</span>`
           : `<div class="admin-user-actions">
               <select data-role="${u.id}">
                 <option value="resident" ${u.role==="resident"?"selected":""}>Житель</option>
@@ -2575,8 +2586,9 @@ function renderAdminUsers(){
       <div class="user-detail-head">
         <div class="user-detail-avatar">${esc(first)}</div>
         <div>
+          <span id="userDetailVerified" class="verification-badge ${user.account_verified===true?"is-verified":"is-unverified"}">${user.account_verified===true?"✓ Подтверждён":"Не подтверждён"}</span>
           <div class="user-detail-name">${esc(user.name||"Без имени")}${user.id!==me.uid&&user.resident_badge?` <span class="resident-badge-inline">${esc(user.resident_badge)}</span>`:""}</div>
-          <span class="user-detail-role">${esc(role(user.role))}</span>
+          <span class="user-detail-role role-${esc(user.role||"resident")}">${esc(role(user.role))}</span>
         </div>
         <button id="userDetailClose" class="user-detail-close" type="button">×</button>
       </div>
@@ -2603,7 +2615,7 @@ function renderAdminUsers(){
         ${user.email?`<a class="secondary user-action-link" href="mailto:${esc(user.email)}">Написать</a>`:""}
       </div>`;
     $("#userDetailClose").onclick=close;
-    if($("#detailVerified"))$("#detailVerified").onchange=async e=>{if(!canViewStudents()){e.target.checked=!e.target.checked;return}const value=e.target.checked;try{const batch=writeBatch(db);batch.update(doc(db,"users",user.id),{account_verified:value,updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",user.id),brsProfileData({...user,account_verified:value}));await batch.commit();user.account_verified=value;renderAdminUsers();toast(value?"Аккаунт подтверждён":"Подтверждение снято")}catch(err){e.target.checked=!value;toast("Не удалось сохранить подтверждение")}};
+    if($("#detailVerified"))$("#detailVerified").onchange=async e=>{if(!canViewStudents()){e.target.checked=!e.target.checked;return}const value=e.target.checked;try{const batch=writeBatch(db);batch.update(doc(db,"users",user.id),{account_verified:value,updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",user.id),brsProfileData({...user,account_verified:value}));await batch.commit();user.account_verified=value;const badge=$("#userDetailVerified");if(badge){badge.classList.toggle("is-verified",value);badge.classList.toggle("is-unverified",!value);badge.textContent=value?"✓ Подтверждён":"Не подтверждён"}renderAdminUsers();toast(value?"Аккаунт подтверждён":"Подтверждение снято")}catch(err){e.target.checked=!value;toast("Не удалось сохранить подтверждение")}};
     if($("#residentBadgeInput"))$("#residentBadgeInput").oninput=e=>{$("#residentBadgePreview").textContent=e.target.value.trim()||"🙂"};
     if($("#clearResidentBadge"))$("#clearResidentBadge").onclick=()=>{$("#residentBadgeInput").value="";$("#residentBadgePreview").textContent="🙂"};
     if($("#saveResidentBadge"))$("#saveResidentBadge").onclick=async()=>{
