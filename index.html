@@ -2848,7 +2848,7 @@ function openAdminBrsPerson(uid){
     <div class="brs-rating-profile-head">
       <div class="meta">Комната</div><b>${esc(u.room||"—")}</b><div class="meta">${u.account_verified===true?"✓ Аккаунт подтверждён":"Аккаунт не подтверждён"}</div>
       <div class="score-big">${u.brs_score>0?"+":""}${u.brs_score} баллов</div>
-      <div class="meta">${esc(u.phone||"Телефон не указан")}${u.email?` · ${esc(u.email)}`:""}</div>
+      ${canViewStudents()?`<div class="meta">${esc(u.phone||"Телефон не указан")}${u.email?` · ${esc(u.email)}`:""}</div>`:""}
     </div>
     <button id="openPersonBrsHistory" class="primary">История БРС</button>
     <button id="closeRatingPerson" class="secondary" style="margin-top:9px">Закрыть</button>`;
@@ -2873,7 +2873,7 @@ function openAdminBrsPersonHistory(uid){
     <div class="brs-rating-profile-head"><div class="meta">Текущий результат</div><div class="score-big">${u.brs_score>0?"+":""}${u.brs_score} баллов</div></div>
     <div class="brs-person-history">${tx.length?tx.map(t=>`<div class="glass rating-history-item" style="${t.cancelled?'opacity:.55':''}">
       <div class="rating-history-top"><div><b>${esc(t.reason_name||"Операция")}</b>
-        <div class="meta">${esc(t.created_label||t.created_date||"—")}${t.comment?` · ${esc(t.comment)}`:""}${t.cancelled?" · отменено":""}</div>
+        <div class="meta">${esc(t.created_label||t.created_date||"—")}${profile.role==="admin"&&t.comment?` · ${esc(t.comment)}`:""}${t.cancelled?" · отменено":""}</div>
       </div><div class="rating-history-points">${Number(t.points||0)>0?"+":""}${Number(t.points||0)}</div></div>
       ${profile.role==="admin"&&!t.cancelled?`<div class="rating-history-actions"><button type="button" data-admin-rating-cancel="${t.id}">Отменить операцию</button></div>`:""}
     </div>`).join(""):'<div class="glass empty">Операций пока нет</div>'}</div>
