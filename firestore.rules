@@ -1,0 +1,156 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function role() {
+      return signedIn() && userDoc().data.role is string
+        ? userDoc().data.role : 'resident';
+    }
+    function isAdmin() { return signedIn() && role() == 'admin'; }
+    function isCouncil() { return signedIn() && role() == 'student_council'; }
+    function canViewStudents() {
+      return isAdmin() || (isCouncil() && userDoc().data.get('view_students', false) == true);
+    }
+    function canViewBrs() {
+      return isAdmin() || (isCouncil() && userDoc().data.get('view_brs', false) == true);
+    }
+    function brsManager() {
+      return isAdmin() || (isCouncil() && userDoc().data.get('brs_manage', false) == true);
+    }
+    function brsCanceller() {
+      return isAdmin() || (isCouncil() && userDoc().data.get('brs_cancel', false) == true);
+    }
+    function ownManagerCopy(txId) {
+      return exists(/databases/$(database)/documents/brs_manager_ops/$(request.auth.uid)/items/$(txId));
+    }
+    function validRoom(room) {
+      return room is string
+        && room.matches('^(?:[2-9]|1[0-6])\\.[1-5]\\.[1-4]$')
+        && (room.matches('^(?:[2-9]|1[0-6])\\.[1-4]\\.[1-2]$')
+          || room.matches('^(?:[2-9]|1[0-6])\\.5\\.[1-4]$'));
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn() && (
+        request.auth.uid == uid || canViewStudents() || canViewBrs() || brsManager()
+      );
+      allow list: if canViewStudents() || canViewBrs() || brsManager();
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role == 'resident'
+        && request.resource.data.get('account_verified', false) == false
+        && !request.resource.data.keys().hasAny([
+          'brs_access', 'brs_manage', 'brs_cancel', 'view_students', 'view_brs', 'resident_badge'
+        ])
+        && validRoom(request.resource.data.room);
+      allow update: if isAdmin() || (
+        isCouncil()
+        && request.auth.uid != uid
+        && userDoc().data.get('view_students', false) == true
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['account_verified', 'updated_at'])
+        && request.resource.data.account_verified is bool
+      ) || (
+        signedIn()
+        && request.auth.uid == uid
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'role', 'brs_access', 'brs_manage', 'brs_cancel',
+          'view_students', 'view_brs', 'resident_badge',
+          'created_at', 'email'
+        ])
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['account_verified'])
+          || (
+            request.resource.data.account_verified == false
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['name', 'room', 'phone'])
+          )
+        )
+        && validRoom(request.resource.data.room)
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.booked_by == request.auth.uid
+        && (request.resource.data.uid == request.auth.uid || isAdmin() || isCouncil());
+      allow update: if false;
+      allow delete: if signedIn() && (
+        isAdmin() || resource.data.uid == request.auth.uid
+        || resource.data.booked_by == request.auth.uid
+      );
+    }
+    match /booking_history/{historyId} {
+      allow read: if isAdmin();
+      allow create: if signedIn() && (
+        isAdmin() || request.resource.data.uid == request.auth.uid
+        || request.resource.data.booked_by == request.auth.uid
+      );
+      allow update, delete: if false;
+    }
+    match /brs_settings/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /brs_reasons/{reasonId} {
+      allow read: if signedIn();
+      allow create, update: if isAdmin();
+      allow delete: if false;
+    }
+    match /brs_transactions/{txId} {
+      allow read: if signedIn() && (
+        isAdmin() || canViewBrs() || resource.data.student_uid == request.auth.uid
+      );
+      allow create: if brsManager()
+        && !request.resource.data.keys().hasAny(['created_by', 'created_by_name']);
+      allow update: if isAdmin() || (
+        brsCanceller()
+        && ownManagerCopy(txId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'cancelled', 'cancelled_by', 'cancelled_by_name',
+          'cancelled_reason', 'cancelled_at'
+        ])
+        && request.resource.data.cancelled == true
+        && request.resource.data.cancelled_by == request.auth.uid
+      );
+      allow delete: if false;
+    }
+    match /brs_audit/{txId} {
+      allow read: if isAdmin();
+      allow create: if brsManager()
+        && request.resource.data.created_by == request.auth.uid;
+      allow update: if isAdmin() || (
+        brsCanceller()
+        && resource.data.created_by == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'cancelled', 'cancelled_by', 'cancelled_by_name',
+          'cancelled_reason', 'cancelled_at'
+        ])
+        && request.resource.data.cancelled == true
+        && request.resource.data.cancelled_by == request.auth.uid
+      );
+      allow delete: if false;
+    }
+    match /brs_manager_ops/{managerUid}/items/{txId} {
+      allow read: if signedIn() && (isAdmin() || request.auth.uid == managerUid);
+      allow create: if brsManager() && request.auth.uid == managerUid;
+      allow update: if isAdmin() || (
+        brsCanceller()
+        && request.auth.uid == managerUid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'cancelled', 'cancelled_by', 'cancelled_by_name',
+          'cancelled_reason', 'cancelled_at'
+        ])
+        && request.resource.data.cancelled == true
+        && request.resource.data.cancelled_by == request.auth.uid
+      );
+      allow delete: if false;
+    }
+  }
+}
