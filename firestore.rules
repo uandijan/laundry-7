@@ -36,9 +36,9 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow get: if signedIn() && (
-        request.auth.uid == uid || canViewStudents() || brsManager()
+        request.auth.uid == uid || canViewStudents()
       );
-      allow list: if canViewStudents() || brsManager();
+      allow list: if canViewStudents();
       allow create: if signedIn()
         && request.auth.uid == uid
         && request.resource.data.role == 'resident'
@@ -122,7 +122,7 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /brs_profiles/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || canViewBrs());
+      allow read: if signedIn() && (request.auth.uid == uid || canViewBrs() || brsManager());
       allow create, update: if isAdmin() || (
         signedIn() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['name', 'room', 'account_verified'])
