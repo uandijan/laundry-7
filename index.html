@@ -2219,6 +2219,27 @@ button:focus-visible{outline:2px solid #1687ff;outline-offset:3px}
 .toast:not(.hidden){animation:motionToast .34s var(--motion-spring) both}
 #pullRefresh{transition:transform .2s var(--motion-ease),opacity .2s ease}
 
+/* iOS WebKit: avoid hundreds of large composited blur layers and a transformed
+   full-screen photo. The opaque gradients retain the glass appearance. */
+.is-ios *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.is-ios #globalBg{
+  inset:0!important;width:100%!important;height:100vh!important;height:100dvh!important;
+  min-width:0!important;min-height:0!important;transform:none!important;
+  will-change:auto!important;filter:none!important;backface-visibility:visible!important;
+}
+.is-ios .glass,.is-ios .schedule-card,.is-ios .date-chip,.is-ios .bottom,
+.is-ios .welcome,.is-ios .user-chip,.is-ios .sheet,
+.is-ios #profilePage .item,.is-ios #adminPage .item,
+.is-ios .brs-hero,.is-ios .brs-score,.is-ios .brs-tx{
+  background:linear-gradient(145deg,rgba(252,254,255,.97),rgba(233,245,253,.94))!important;
+}
+.is-ios .date-chip.active{background:linear-gradient(145deg,#1687ff,#58b3ff)!important;color:#fff!important}
+.is-ios .page-enter,.is-ios .page-enter > :is(.title,.item,.glass,.brs-hero),
+.is-ios .mine{animation:none!important}
+.admin-pager,.rating-pager{display:flex;align-items:center;justify-content:space-between;gap:9px;margin:12px 0 20px;padding:10px 12px;border-radius:18px;background:rgba(248,252,255,.95);color:#365a78;font-size:12px;font-weight:700}
+.admin-pager button,.rating-pager button{border:0;border-radius:12px;background:#e4f1fc;color:#1766a9;padding:9px 10px;font-weight:750}
+.admin-pager button:disabled,.rating-pager button:disabled{opacity:.4}
+
 /* Keep the same readable glass density on Android, whose earlier rules are more specific. */
 html.is-android :is(.glass,.schedule-card,.date-chip,#myBookings .item,#profilePage .card,#adminPage .item,.admin-search-wrap,.stat-card,.bottom,.user-chip,#editProfile,#logout){
   background:linear-gradient(145deg,rgba(252,254,255,.93),rgba(237,247,253,.88))!important;
@@ -2259,6 +2280,10 @@ html.is-android .profile-avatar{background:linear-gradient(145deg,#1687ff,#66bbf
 <script>
   if (/Android/i.test(navigator.userAgent)) {
     document.documentElement.classList.add("is-android");
+  }
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+    document.documentElement.classList.add("is-ios");
   }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -2454,6 +2479,8 @@ function info(b){
   };
 }async function loadMy(){$("#myBookings").innerHTML='<div class="loader">Загружаем…</div>';try{const s=await getDocs(query(collection(db,'bookings'),where('uid','==',me.uid))),a=s.docs.map(d=>({id:d.id,...d.data()})).filter(active).sort((a,b)=>(a.date+a.start_time).localeCompare(b.date+b.start_time));$("#myBookings").innerHTML=a.length?a.map(b=>`<div class="glass item"><div class="row"><div><div class="item-title">Машина №${b.machine_number}</div><div class="meta">${fmt(b.date)} · ${b.start_time}–${pad(+b.start_time.slice(0,2)+1)}:00</div></div><span class="status">Активна</span></div><button class="small" data-cancel="${b.id}" style="margin-top:12px">Отменить</button></div>`).join(''):'<div class="glass empty">Активных записей пока нет</div>';$$('[data-cancel]').forEach(x=>x.onclick=()=>cancelBooking(a.find(b=>b.id===x.dataset.cancel)))}catch(e){$("#myBookings").innerHTML='<div class="glass empty">Не удалось загрузить записи</div>'}}
 let adminUsersCache=[];
+let adminUsersPage=0;
+const adminUsersPageSize=40;
 
 function renderAdminUsers(){
   const q=($("#adminUserSearch")?.value||"").trim().toLowerCase();
@@ -2477,12 +2504,15 @@ function renderAdminUsers(){
     ].join(" ").toLowerCase();
     return hay.includes(q);
   });
+  const pageCount=Math.max(1,Math.ceil(filtered.length/adminUsersPageSize));
+  adminUsersPage=Math.min(adminUsersPage,pageCount-1);
+  const visible=filtered.slice(adminUsersPage*adminUsersPageSize,(adminUsersPage+1)*adminUsersPageSize);
 
   const clear=$("#clearAdminSearch");
   if(clear) clear.classList.toggle("hidden",!q);
 
   $("#adminUsers").innerHTML=filtered.length
-    ? filtered.map(u=>`
+    ? visible.map(u=>`
       <div class="glass item admin-user user-card-clickable" data-user-card="${u.id}">
         <div class="user-card-main">
           <div class="item-title">${esc(u.name||"Без имени")}${u.id!==me.uid&&u.resident_badge?` <span class="resident-badge-inline">${esc(u.resident_badge)}</span>`:""}</div>
@@ -2501,7 +2531,7 @@ function renderAdminUsers(){
               <button class="delete-user-btn" data-delete-user="${u.id}" type="button">Удалить</button>
             </div>`
         }
-      </div>`).join("")
+      </div>`).join("") + (pageCount>1?`<div class="admin-pager"><button id="adminPrev" type="button" ${adminUsersPage===0?'disabled':''}>Назад</button><span>${adminUsersPage+1} из ${pageCount}</span><button id="adminNext" type="button" ${adminUsersPage===pageCount-1?'disabled':''}>Далее</button></div>`:"")
     : `<div class="glass empty">${q?"Никого не нашли":"Пользователей пока нет"}</div>`;
 
   $$("[data-role]").forEach(x=>x.onchange=async()=>{
@@ -2616,10 +2646,13 @@ function renderAdminUsers(){
     };
   });
 
+  if($("#adminPrev"))$("#adminPrev").onclick=()=>{adminUsersPage--;renderAdminUsers();window.scrollTo(0,0)};
+  if($("#adminNext"))$("#adminNext").onclick=()=>{adminUsersPage++;renderAdminUsers();window.scrollTo(0,0)};
 }
 
 async function adminUsers(){
   $("#adminUsers").innerHTML='<div class="loader">Загружаем…</div>';
+  adminUsersPage=0;
   try{
     const s=await getDocs(collection(db,"users"));
     adminUsersCache=s.docs
@@ -2633,7 +2666,7 @@ async function adminUsers(){
 
 async function adminHistory(){$("#adminHistory").innerHTML='<div class="loader">Загружаем…</div>';try{const s=await getDocs(query(collection(db,'booking_history'),orderBy('cancelled_at','desc'),limit(100))),a=s.docs.map(d=>d.data());$("#adminHistory").innerHTML=a.length?a.map(b=>`<div class="glass item"><div class="item-title">${fmt(b.date)} · ${b.start_time} · машина №${b.machine_number}</div><div class="meta">${esc(b.name)} · комната ${esc(b.room)} · ${esc(b.phone)}<br>Статус: отменено</div></div>`).join(''):'<div class="glass empty">История пока пустая</div>'}catch(e){$("#adminHistory").innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}}const adminSearch=$("#adminUserSearch");
 if(adminSearch){
-  adminSearch.addEventListener("input",renderAdminUsers);
+  adminSearch.addEventListener("input",()=>{adminUsersPage=0;renderAdminUsers()});
 }
 const clearAdminSearch=$("#clearAdminSearch");
 if(clearAdminSearch){
@@ -2734,6 +2767,8 @@ document.addEventListener("click",e=>{if(!e.target.closest("#accountChip")&&!e.t
 
 
 let adminBrsRatingUsers=[],adminBrsRatingTx=[],adminBrsRatingRows=[];
+let brsRatingPage=0;
+const brsRatingPageSize=40;
 
 async function openAdminBrsRating(){
   if(profile?.role!=="admin")return;
@@ -2746,6 +2781,7 @@ async function openAdminBrsRating(){
   $("#moduleName").textContent="БРС";
   $("#brsRatingList").innerHTML='<div class="loader">Загружаем рейтинг…</div>';
   $("#brsRatingSearch").value="";
+  brsRatingPage=0;
   $("#clearBrsRatingSearch").classList.add("hidden");
   try{
     const [us,ts]=await Promise.all([
@@ -2771,18 +2807,23 @@ async function openAdminBrsRating(){
 function renderAdminBrsRating(){
   const q=$("#brsRatingSearch").value.trim().toLowerCase();
   const rows=adminBrsRatingRows.filter(u=>!q||`${u.name||""} ${u.room||""}`.toLowerCase().includes(q));
+  const pageCount=Math.max(1,Math.ceil(rows.length/brsRatingPageSize));
+  brsRatingPage=Math.min(brsRatingPage,pageCount-1);
+  const visible=rows.slice(brsRatingPage*brsRatingPageSize,(brsRatingPage+1)*brsRatingPageSize);
   $("#clearBrsRatingSearch").classList.toggle("hidden",!q);
   $("#brsRatingList").innerHTML=rows.length
-    ? `<div class="brs-rating-list">${rows.map(u=>{
+    ? `<div class="brs-rating-list">${visible.map(u=>{
         const rank=adminBrsRatingRows.findIndex(x=>x.id===u.id)+1;
         return `<button class="brs-rating-row" data-rating-user="${u.id}">
           <span class="brs-rank-number">${rank}</span>
           <span class="brs-rating-person"><b>${esc(u.name||"Без имени")}</b><small>Комната ${esc(u.room||"—")}</small></span>
           <span class="brs-rating-score">${u.brs_score>0?"+":""}${u.brs_score}</span>
         </button>`;
-      }).join("")}</div>`
+      }).join("")}</div>${pageCount>1?`<div class="rating-pager"><button id="ratingPrev" type="button" ${brsRatingPage===0?'disabled':''}>Назад</button><span>${brsRatingPage+1} из ${pageCount}</span><button id="ratingNext" type="button" ${brsRatingPage===pageCount-1?'disabled':''}>Далее</button></div>`:""}`
     : '<div class="glass empty">Никого не найдено</div>';
   $$("[data-rating-user]").forEach(b=>b.onclick=()=>openAdminBrsPerson(b.dataset.ratingUser));
+  if($("#ratingPrev"))$("#ratingPrev").onclick=()=>{brsRatingPage--;renderAdminBrsRating();window.scrollTo(0,0)};
+  if($("#ratingNext"))$("#ratingNext").onclick=()=>{brsRatingPage++;renderAdminBrsRating();window.scrollTo(0,0)};
 }
 function openAdminBrsPerson(uid){
   if(profile?.role!=="admin")return;
@@ -2891,8 +2932,8 @@ function exportAdminBrsRatingExcel(){
 }
 $("#exportBrsRatingExcel").onclick=exportAdminBrsRatingExcel;
 
-$("#brsRatingSearch").oninput=renderAdminBrsRating;
-$("#clearBrsRatingSearch").onclick=()=>{$("#brsRatingSearch").value="";renderAdminBrsRating();$("#brsRatingSearch").focus()};
+$("#brsRatingSearch").oninput=()=>{brsRatingPage=0;renderAdminBrsRating()};
+$("#clearBrsRatingSearch").onclick=()=>{$("#brsRatingSearch").value="";brsRatingPage=0;renderAdminBrsRating();$("#brsRatingSearch").focus()};
 
 function brsPage(n){$("#brsRatingPage")?.classList.add("hidden");$("#bottom").classList.remove("hidden");$$(".brs-page").forEach(x=>x.classList.add("hidden"));const target=$("#brs"+n[0].toUpperCase()+n.slice(1)+"Page");target.classList.remove("hidden","page-enter");window.scrollTo(0,0);void target.offsetWidth;target.classList.add("page-enter");$$(".brs-nav").forEach(x=>x.classList.toggle("active",x.dataset.brsPage===n));if(n==="home")renderBrsHome();if(n==="history")renderBrsHistory();if(n==="operation")renderBrsOperation();if(n==="manage")renderBrsManage();}
 $$('.brs-nav').forEach(x=>x.onclick=()=>brsPage(x.dataset.brsPage));
@@ -2926,6 +2967,7 @@ setInterval(()=>{if(me&&selectedDate){renderDates();watch()}},60000);
 // Reveal newly loaded content without animating every cell in the schedule.
 const motionPreference=window.matchMedia("(prefers-reduced-motion: reduce)");
 for(const id of ["scheduleGrid","myBookings","adminUsers","adminHistory","brsPersonal","brsWork","brsHistory","brsOperation","brsManage","brsRatingList"]){
+  if(document.documentElement.classList.contains("is-ios"))break;
   const container=document.getElementById(id);
   if(!container)continue;
   new MutationObserver(records=>{
