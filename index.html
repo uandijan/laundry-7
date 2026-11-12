@@ -2811,13 +2811,14 @@ function brsPersonMatches(u,query){
   return `${u.name||""} ${u.room||""}`.toLowerCase().includes(q);
 }
 const brsProfileData=u=>({name:u.name||"",room:u.room||"",account_verified:u.account_verified===true});
-const brsViewData=t=>({student_uid:t.student_uid||"",student_name:t.student_name||"",student_room:t.student_room||"",points:Number(t.points||0),reason_name:t.reason_name||"",created_date:t.created_date||"",created_label:t.created_label||"",created_ms:Number(t.created_ms||0),cancelled:t.cancelled===true});
+const brsViewData=t=>({student_uid:t.student_uid||"",student_name:t.student_name||"",student_room:t.student_room||"",points:Number(t.points||0),reason_name:t.reason_name||"",comment:String(t.comment||""),created_date:t.created_date||"",created_label:t.created_label||"",created_ms:Number(t.created_ms||0),cancelled:t.cancelled===true});
 async function ensureBrsViews(users,transactions){
   const settings=await getDoc(doc(db,"brs_settings","main"));
-  if(settings.data()?.brs_views_ready===true)return;
-  const entries=[...users.map(u=>["brs_profiles",u.id,brsProfileData(u)]),...transactions.map(t=>["brs_view",t.id,brsViewData(t)])];
-  for(let i=0;i<entries.length;i+=400){const batch=writeBatch(db);for(const [coll,id,data] of entries.slice(i,i+400))batch.set(doc(db,coll,id),data);await batch.commit()}
-  await setDoc(doc(db,"brs_settings","main"),{brs_views_ready:true,brs_views_ready_at:serverTimestamp()},{merge:true});
+  const fullMigration=settings.data()?.brs_views_ready!==true;
+  if(!fullMigration&&settings.data()?.brs_view_comments_ready===true)return;
+  const entries=[...(fullMigration?users.map(u=>["brs_profiles",u.id,brsProfileData(u)]):[]),...transactions.map(t=>["brs_view",t.id,fullMigration?brsViewData(t):{comment:String(t.comment||"")}])];
+  for(let i=0;i<entries.length;i+=400){const batch=writeBatch(db);for(const [coll,id,data] of entries.slice(i,i+400))batch.set(doc(db,coll,id),data,{merge:!fullMigration});await batch.commit()}
+  await setDoc(doc(db,"brs_settings","main"),{brs_views_ready:true,brs_view_comments_ready:true,brs_views_ready_at:serverTimestamp()},{merge:true});
 }
 
 async function openAdminBrsRating(){
