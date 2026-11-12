@@ -2391,7 +2391,7 @@ button:active,.date-chip:active,.nav:active,.slot:active{transform:scale(.97)!im
   .bottom .nav{min-height:58px!important}
 }
 /* Liquid glass details: translucent layers, soft highlights, restrained status color. */
-#globalBg{background:radial-gradient(ellipse at 50% -18%,rgba(147,199,247,.38),transparent 60%),linear-gradient(180deg,#eaf3fb 0%,#f5f8fb 58%,#edf3f9 100%)!important;transform:none!important;will-change:auto!important}
+#globalBg{background:linear-gradient(180deg,rgba(230,243,253,.39),rgba(227,240,251,.5)),url("./dorm-bg.jpg?v=50") center center/cover no-repeat!important;transform:none!important;will-change:auto!important}
 .topbar{background:linear-gradient(180deg,rgba(238,246,253,.92),rgba(238,246,253,0))!important}
 .mini-brand,.user-chip,.bottom,.date-chip:not(.active){backdrop-filter:blur(24px) saturate(1.3)!important;-webkit-backdrop-filter:blur(24px) saturate(1.3)!important}
 .schedule-card,.welcome,.glass:not(.schedule-card),.brs-rating-row,.admin-user{background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(246,250,254,.78))!important;backdrop-filter:blur(28px) saturate(1.2)!important;-webkit-backdrop-filter:blur(28px) saturate(1.2)!important}
@@ -2402,6 +2402,8 @@ button:active,.date-chip:active,.nav:active,.slot:active{transform:scale(.97)!im
 #adminPage .verification-badge.is-unverified,.user-detail-head .verification-badge.is-unverified{background:rgba(213,78,91,.09)!important;color:#b44152!important;border-color:rgba(213,78,91,.14)!important}
 .verification-panel{padding:5px 16px!important;border-radius:19px!important;margin:13px 0!important}
 .verification-panel .brs-switch-row{min-height:62px!important;gap:12px!important}
+.verification-panel .brs-switch-row{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;margin:0!important}
+.verification-panel:before,.verification-panel:after{display:none!important}
 .verification-panel b{font-size:14px!important;color:#203d58!important}
 .verification-panel .meta{font-size:12px!important;margin-top:3px!important;color:#72879a!important}
 .verification-panel .ios-switch{flex:0 0 auto}
@@ -2411,6 +2413,7 @@ button:active,.date-chip:active,.nav:active,.slot:active{transform:scale(.97)!im
 .brs-rating-row,.admin-user{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease!important}
 .brs-rating-row:hover,.admin-user:hover{transform:translateY(-3px)!important;box-shadow:0 16px 28px rgba(27,58,86,.13)!important}
 .sheet{animation:motionSheet .4s cubic-bezier(.22,1,.36,1) both!important}
+.modal.origin-open .sheet{animation:none!important}
 @media(max-width:520px){.verification-panel{padding:4px 13px!important}.admin-user{padding:13px!important}.user-card-main .item-title{font-size:15px!important}}
 @media(prefers-reduced-motion:reduce){.brs-rating-row,.admin-user,.date-chip{transition:none!important}.sheet{animation:none!important}}
 </style>
@@ -2449,6 +2452,19 @@ function validRoom(v){const m=String(v||"").trim().match(/^(\d{1,2})\.(\d)\.(\d)
 function roomError(v){const x=String(v||"").trim();const m=x.match(/^(\d{1,2})\.(\d)\.(\d)$/);if(!m)return"Формат комнаты: этаж.блок.комната — например, 2.3.2";if(+m[1]<2||+m[1]>16)return"Жилой этаж должен быть от 2 до 16";if(+m[2]<1||+m[2]>5)return"Блок должен быть от 1 до 5";const maxRoom=+m[2]===5?4:2;if(+m[3]<1||+m[3]>maxRoom)return +m[2]===5?"В 5 блоке комнаты 1–4":"В блоках 1–4 только комнаты 1 и 2";return""}
 function needsProfileUpdate(p){return Number(p?.profile_version||0)<2||!validRoom(p?.room)}
 async function saveMyProfile(data){const next={...profile,...data};const batch=writeBatch(db);batch.update(doc(db,"users",me.uid),data);batch.set(doc(db,"brs_profiles",me.uid),brsProfileData(next));await batch.commit()}
+function animateSheetFrom(source){
+  if(!source||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const from=source.getBoundingClientRect(),modal=$("#modal"),sheet=$("#sheet");
+  if(!from.width||!from.height)return;
+  modal.classList.add('origin-open');
+  requestAnimationFrame(()=>{
+    if(modal.classList.contains('hidden'))return;
+    const to=sheet.getBoundingClientRect();
+    const dx=from.left+from.width/2-to.left-to.width/2,dy=from.top+from.height/2-to.top-to.height/2;
+    const sx=Math.max(.12,Math.min(.65,from.width/to.width)),sy=Math.max(.12,Math.min(.65,from.height/to.height));
+    sheet.animate([{opacity:.25,transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,borderRadius:'18px'},{opacity:1,transform:'translate(0,0) scale(1)',borderRadius:'30px'}],{duration:480,easing:'cubic-bezier(.18,.85,.2,1)'}).onfinish=()=>modal.classList.remove('origin-open');
+  });
+}
 function profileUpdateModal(){
   $("#modal").classList.remove("hidden");$("#modal").classList.add("required-profile-mode");
   $("#sheet").innerHTML=`<span class="profile-update-badge">Обновление профиля</span><h2>Уточните данные</h2><p class="muted">Мы приводим данные жильцов к единому формату. Проверьте полное ФИО и номер комнаты.</p><label>Полное ФИО</label><input id="uName" class="input" value="${esc(profile?.name||me?.displayName||"")}" placeholder="Полное имя"><div class="profile-hint">Укажите полное имя так, как оно указано в документах.</div><label>Комната</label><input id="uRoom" class="input" value="${esc(profile?.room||"")}" placeholder="3.3.1" type="text" inputmode="text" autocomplete="off"><div id="uRoomHint" class="profile-hint">Формат: этаж.блок.комната. Жилые этажи 2–16; в блоках 1–4 комнаты 1–2, в блоке 5 комнаты 1–4.</div><button id="uSave" class="primary" style="margin-top:16px">Сохранить и продолжить</button>`;
@@ -2514,14 +2530,14 @@ function renderSchedule(bs){
   $$('.slot:not(.expired)').forEach(x=>x.onclick=()=>{
     const h=+x.dataset.h,m=+x.dataset.m,raw=map.get(`${pad(h)}:00_${m}`),b=raw&&bookingStillVisible(selectedDate,h)?raw:null;
     if(x.classList.contains('locked'))return toast('Выходные доступны только студсовету');
-    if(b)return info(b);
+    if(b){info(b);animateSheetFrom(x);return}
     if(cutoff(selectedDate,h))return;
     if(multiMode){
       const k=multiKey(selectedDate,h,m);
       multiSelected.has(k)?multiSelected.delete(k):multiSelected.add(k);
       renderSchedule(bs);updateMultiUi();return
     }
-    create(selectedDate,h,m)
+    create(selectedDate,h,m);animateSheetFrom(x)
   });
   updateMultiUi()
 }
@@ -2754,6 +2770,7 @@ function renderAdminUsers(){
         ${user.phone?`<a class="secondary user-action-link" href="tel:${esc(user.phone)}">Позвонить</a>`:""}
         ${user.email?`<a class="secondary user-action-link" href="mailto:${esc(user.email)}">Написать</a>`:""}
       </div>`;
+    animateSheetFrom(card);
     $("#userDetailClose").onclick=close;
     if($("#detailVerified"))$("#detailVerified").onchange=async e=>{if(!canViewStudents()){e.target.checked=!e.target.checked;return}const value=e.target.checked;try{const batch=writeBatch(db);batch.update(doc(db,"users",user.id),{account_verified:value,updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",user.id),brsProfileData({...user,account_verified:value}));await batch.commit();user.account_verified=value;const badge=$("#userDetailVerified");if(badge){badge.classList.toggle("is-verified",value);badge.classList.toggle("is-unverified",!value);badge.textContent=value?"Подтверждён":"Не подтверждён"}renderAdminUsers();toast(value?"Аккаунт подтверждён":"Подтверждение снято")}catch(err){e.target.checked=!value;toast("Не удалось сохранить подтверждение")}};
     if($("#residentBadgeInput"))$("#residentBadgeInput").oninput=e=>{$("#residentBadgePreview").textContent=e.target.value.trim()||"🙂"};
@@ -3017,7 +3034,7 @@ function renderAdminBrsRating(){
         </button>`;
       }).join("")}</div>${pageCount>1?`<div class="rating-pager"><button id="ratingPrev" type="button" ${brsRatingPage===0?'disabled':''}>Назад</button><span>${brsRatingPage+1} из ${pageCount}</span><button id="ratingNext" type="button" ${brsRatingPage===pageCount-1?'disabled':''}>Далее</button></div>`:""}`
     : '<div class="glass empty">Никого не найдено</div>';
-  $$("[data-rating-user]").forEach(b=>b.onclick=()=>openAdminBrsPerson(b.dataset.ratingUser));
+  $$("[data-rating-user]").forEach(b=>b.onclick=()=>{openAdminBrsPerson(b.dataset.ratingUser);animateSheetFrom(b)});
   if($("#ratingPrev"))$("#ratingPrev").onclick=()=>{brsRatingPage--;renderAdminBrsRating();window.scrollTo(0,0)};
   if($("#ratingNext"))$("#ratingNext").onclick=()=>{brsRatingPage++;renderAdminBrsRating();window.scrollTo(0,0)};
 }
