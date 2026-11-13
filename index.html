@@ -3048,11 +3048,11 @@ function exportAdminBrsRatingExcel(){
     for(const t of entries){const score=totals.get(t.student_uid);if(!score)continue;const points=Number(t.points);if(points>0)score.positive+=points;else score.negative+=points}
     const summary=[["№","ФИО","Группа","Комната / блок","Поощрения","Нарушения (баллы)","Итог","Статус"]];
     users.forEach((u,i)=>{const score=totals.get(u.id);summary.push([i+1,u.name||"Без имени",u.group||"",u.room||"",score.positive,score.negative,score.positive+score.negative,role(u.role)])});
-    const diary=[["ФИО","Группа","Комната / блок","Дата","Тип","Баллы","Ответственный","Примечание"]];
-    entries.forEach(t=>{const u=byId.get(t.student_uid);const date=t.created_label||t.created_date||"";diary.push([u?.name||t.student_name||"",u?.group||"",u?.room||t.student_room||"",date,Number(t.points)>0?"Начисление":"Списание",Number(t.points),t.created_by_name||"",t.comment||""])});
+    const diary=[["ФИО","Группа","Комната / блок","Дата","Тип","Событие","Баллы","Ответственный","Примечание"]];
+    entries.forEach(t=>{const u=byId.get(t.student_uid);const date=t.created_label||t.created_date||"";diary.push([u?.name||t.student_name||"",u?.group||"",u?.room||t.student_room||"",date,Number(t.points)>0?"Начисление":"Списание",t.reason_name||"Другое",Number(t.points),t.created_by_name||"",t.comment||""])});
     const students=[["ФИО","Группа","Комната / блок"],...users.map(u=>[u.name||"Без имени",u.group||"",u.room||""])];
     const wb=window.XLSX.utils.book_new();
-    for(const [name,data,widths] of [["Свод",summary,[7,38,13,18,17,22,12,20]],["Дневник",diary,[38,13,18,21,16,12,34,52]],["Справочник",[["Тип","Событие","Балл"],...brsReferenceRows],[17,90,12]],["список студентов",students,[38,13,18]]]){
+    for(const [name,data,widths] of [["Свод",summary,[7,38,13,18,17,22,12,20]],["Дневник",diary,[38,13,18,21,16,56,12,34,52]],["Справочник",[["Тип","Событие","Балл"],...brsReferenceRows],[17,90,12]],["список студентов",students,[38,13,18]]]){
       const ws=window.XLSX.utils.aoa_to_sheet(data);
       ws["!cols"]=widths.map(wch=>({wch}));
       ws["!autofilter"]={ref:`A1:${window.XLSX.utils.encode_col(data[0].length-1)}${data.length}`};
