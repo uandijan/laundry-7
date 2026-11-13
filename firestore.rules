@@ -18,8 +18,12 @@ service cloud.firestore {
     function canViewBrs() {
       return isAdmin() || (isCouncil() && userDoc().data.get('view_brs', false) == true);
     }
+    function hasBrsManage(user) {
+      return user.role == 'admin' ||
+        (user.role == 'student_council' && user.get('brs_manage', false) == true);
+    }
     function brsManager() {
-      return isAdmin() || (isCouncil() && userDoc().data.get('brs_manage', false) == true);
+      return signedIn() && hasBrsManage(userDoc().data);
     }
     function brsCanceller() {
       return isAdmin() || (isCouncil() && userDoc().data.get('brs_cancel', false) == true);
