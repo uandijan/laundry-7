@@ -2368,7 +2368,7 @@ function animateSheetFrom(source){
     const to=sheet.getBoundingClientRect();
     const dx=from.left+from.width/2-to.left-to.width/2,dy=from.top+from.height/2-to.top-to.height/2;
     const sx=Math.max(.12,Math.min(.65,from.width/to.width)),sy=Math.max(.12,Math.min(.65,from.height/to.height));
-    sheet.animate([{opacity:.25,transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,borderRadius:'18px'},{opacity:1,transform:'translate(0,0) scale(1)',borderRadius:'30px'});
+    sheet.animate([{opacity:.25,transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,borderRadius:'18px'},{opacity:1,transform:'translate(0,0) scale(1)',borderRadius:'30px'}],{duration:480,easing:'cubic-bezier(.18,.85,.2,1)'});
   });
 }
 function profileUpdateModal(){
