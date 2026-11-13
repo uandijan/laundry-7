@@ -3047,7 +3047,8 @@ function exportAdminBrsRatingExcel(){
     const entries=adminBrsRatingTx.filter(activeBrsExportTx).sort((a,b)=>Number(a.created_ms||0)-Number(b.created_ms||0));
     for(const t of entries){const score=totals.get(t.student_uid);if(!score)continue;const points=Number(t.points);if(points>0)score.positive+=points;else score.negative+=points}
     const summary=[["№","ФИО","Группа","Комната / блок","Поощрения","Нарушения (баллы)","Итог","Статус"]];
-    users.forEach((u,i)=>{const score=totals.get(u.id);summary.push([i+1,u.name||"Без имени",u.group||"",u.room||"",score.positive,score.negative,score.positive+score.negative,role(u.role)])});
+    const rankedUsers=[...users].sort((a,b)=>{const as=totals.get(a.id),bs=totals.get(b.id);return (bs.positive+bs.negative)-(as.positive+as.negative)||String(a.name||"").localeCompare(String(b.name||""),"ru")});
+    rankedUsers.forEach((u,i)=>{const score=totals.get(u.id);summary.push([i+1,u.name||"Без имени",u.group||"",u.room||"",score.positive,score.negative,score.positive+score.negative,role(u.role)])});
     const diary=[["ФИО","Группа","Комната / блок","Дата","Тип","Событие","Баллы","Ответственный","Примечание"]];
     entries.forEach(t=>{const u=byId.get(t.student_uid);const date=t.created_label||t.created_date||"";diary.push([u?.name||t.student_name||"",u?.group||"",u?.room||t.student_room||"",date,Number(t.points)>0?"Начисление":"Списание",t.reason_name||"Другое",Number(t.points),t.created_by_name||"",t.comment||""])});
     const students=[["ФИО","Группа","Комната / блок"],...users.map(u=>[u.name||"Без имени",u.group||"",u.room||""])];
