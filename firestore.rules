@@ -38,6 +38,13 @@ service cloud.firestore {
           || room.matches('^(?:[2-9]|1[0-6])\\.5\\.[1-4]$'));
     }
 
+    match /deleted_users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.keys().hasOnly(['deleted_at']);
+      allow update, delete: if false;
+    }
+
     match /users/{uid} {
       allow get: if signedIn() && (
         request.auth.uid == uid || canViewStudents()
@@ -50,7 +57,8 @@ service cloud.firestore {
         && !request.resource.data.keys().hasAny([
           'brs_access', 'brs_manage', 'brs_cancel', 'view_students', 'view_brs', 'resident_badge'
         ])
-        && validRoom(request.resource.data.room);
+        && validRoom(request.resource.data.room)
+        && !exists(/databases/$(database)/documents/deleted_users/$(uid));
       allow update: if isAdmin() || (
         isCouncil()
         && request.auth.uid != uid
@@ -96,7 +104,10 @@ service cloud.firestore {
         isAdmin() || request.resource.data.uid == request.auth.uid
         || request.resource.data.booked_by == request.auth.uid
       );
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAdmin()
+        && resource.data.uid is string
+        && !exists(/databases/$(database)/documents/users/$(resource.data.uid));
     }
     match /brs_settings/{id} {
       allow read: if signedIn();
@@ -123,7 +134,9 @@ service cloud.firestore {
         && request.resource.data.cancelled == true
         && request.resource.data.cancelled_by == request.auth.uid
       );
-      allow delete: if false;
+      allow delete: if isAdmin()
+        && resource.data.student_uid is string
+        && !exists(/databases/$(database)/documents/users/$(resource.data.student_uid));
     }
     match /brs_profiles/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || canViewBrs() || brsManager());
@@ -161,7 +174,9 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelled'])
         && request.resource.data.cancelled == true
       );
-      allow delete: if false;
+      allow delete: if isAdmin()
+        && resource.data.student_uid is string
+        && !exists(/databases/$(database)/documents/users/$(resource.data.student_uid));
     }
     match /brs_audit/{txId} {
       allow read: if isAdmin();
@@ -177,7 +192,9 @@ service cloud.firestore {
         && request.resource.data.cancelled == true
         && request.resource.data.cancelled_by == request.auth.uid
       );
-      allow delete: if false;
+      allow delete: if isAdmin()
+        && resource.data.student_uid is string
+        && !exists(/databases/$(database)/documents/users/$(resource.data.student_uid));
     }
     match /brs_manager_ops/{managerUid}/items/{txId} {
       allow read: if signedIn() && (isAdmin() || request.auth.uid == managerUid);
@@ -192,7 +209,11 @@ service cloud.firestore {
         && request.resource.data.cancelled == true
         && request.resource.data.cancelled_by == request.auth.uid
       );
-      allow delete: if false;
+      allow delete: if isAdmin() && (
+        !exists(/databases/$(database)/documents/users/$(managerUid))
+        || (resource.data.student_uid is string
+          && !exists(/databases/$(database)/documents/users/$(resource.data.student_uid)))
+      );
     }
   }
 }

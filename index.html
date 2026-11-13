@@ -2336,7 +2336,7 @@ body{background:transparent!important}
   <input id="brsRatingSearch" type="search" placeholder="Поиск по ФИО или комнате" autocomplete="off">
   <button id="clearBrsRatingSearch" class="search-clear hidden" type="button" aria-label="Очистить поиск">×</button>
 </div>
-<button id="exportBrsRatingExcel" class="secondary brs-excel-export" type="button">↗ Экспортировать рейтинг в Excel</button>
+<button id="exportBrsRatingExcel" class="secondary brs-excel-export" type="button">↗ Экспортировать рейтинг в Excel</button><button id="cleanupDeletedUsers" class="secondary brs-excel-export hidden" type="button">Очистить данные удалённых жильцов</button>
 <div id="brsRatingList"><div class="loader">Загружаем рейтинг…</div></div>
 </section><section id="brsHomePage" class="hidden brs-page"><div class="brs-hero glass"><div class="brs-beta">БРС общежития №7</div><h1>Ваши баллы</h1><p>Достижения и история баллов в одном месте.</p></div><div id="brsPersonal"></div><div id="brsWork"></div></section><section id="brsHistoryPage" class="hidden brs-page"><div class="title">История БРС</div><div id="brsHistory"></div></section><section id="brsOperationPage" class="hidden brs-page"><div class="title">Операция</div><div id="brsOperation"></div></section><section id="brsManagePage" class="hidden brs-page"><div class="title">Управление БРС</div><div id="brsManage"></div></section></main><nav id="bottom" class="glass bottom"><button class="nav active laundry-nav" data-module-nav="laundry" data-page="schedule"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="my"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/><path d="M8 13h3M13 13h3M8 16h3"/></svg></span><span class="nav-label">Мои записи</span></button><button class="nav laundry-nav" data-module-nav="laundry" data-page="profile"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span><span class="nav-label">Профиль</span></button><button id="adminNav" class="nav hidden laundry-nav" style="display:none!important" data-module-nav="laundry" data-page="admin"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.18.36.39.68.6 1 .3.46.8.72 1.35.72H21v4h-.1A1.7 1.7 0 0 0 19.4 15z"/></svg></span><span class="nav-label">Управление</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="home"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="nav-label">Главная</span></button><button id="brsOpNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="operation"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v14M3.5 7.5 7 4l3.5 3.5M17 20V6M13.5 16.5 17 20l3.5-3.5"/></svg></span><span class="nav-label">Операция</span></button><button class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="history"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="nav-label">История</span></button><button id="brsManageNav" class="nav brs-nav hidden" data-module-nav="brs" data-brs-page="manage"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.12-1.28l2-1.55-2-3.46-2.46 1a7 7 0 0 0-2.2-1.28L13.9 3h-4l-.32 2.43a7 7 0 0 0-2.2 1.28l-2.46-1-2 3.46 2 1.55A7 7 0 0 0 4.8 12c0 .44.04.87.12 1.28l-2 1.55 2 3.46 2.46-1a7 7 0 0 0 2.2 1.28L9.9 21h4l.32-2.43a7 7 0 0 0 2.2-1.28l2.46 1 2-3.46-2-1.55c.08-.41.12-.84.12-1.28z"/></svg></span><span class="nav-label">Управление</span></button></nav></section><div id="modal" class="modal hidden"><div id="sheet" class="sheet"></div></div>
 <script>
@@ -2381,7 +2381,7 @@ function profileUpdateModal(){
 }
 function authTab(login){$("#loginForm").classList.toggle("hidden",!login);$("#registerForm").classList.toggle("hidden",login);$("#loginTab").classList.toggle("active",login);$("#registerTab").classList.toggle("active",!login)}$("#loginTab").onclick=()=>authTab(true);$("#registerTab").onclick=()=>authTab(false);$("#loginForm").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("#loginEmail").value.trim(),$("#loginPassword").value)}catch(e){toast("Не удалось войти")}};$("#registerForm").onsubmit=async e=>{e.preventDefault();const name=$("#regName").value.trim(),room=$("#regRoom").value.trim(),group=normalizeGroup($("#regGroup").value),phone=$("#regPhone").value.trim();if(!group)return toast("Укажите группу слитно: четыре цифры и необязательная буква");if(!name||!room||!phone)return toast("Заполни все поля");if(!validRoom(room))return toast(roomError(room));try{const c=await createUserWithEmailAndPassword(auth,$("#regEmail").value.trim(),$("#regPassword").value);const batch=writeBatch(db);batch.set(doc(db,"users",c.user.uid),{name,room,group,phone,email:c.user.email,account_verified:false,role:"resident",profile_version:3,created_at:serverTimestamp(),updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",c.user.uid),{name,room,account_verified:false});await batch.commit()}catch(e){toast("Регистрация не удалась")}};async function google(){try{const c=await signInWithPopup(auth,provider),s=await getDoc(doc(db,"users",c.user.uid));if(!s.exists())setup(c.user)}catch(e){console.error("Google sign-in failed:",e);toast(`Google-вход не удался (${e.code||"сеть"}). Попробуйте ещё раз.`)}}$("#google1").onclick=google;$("#google2").onclick=google;$("#reset").onclick=async e=>{e.preventDefault();const x=$("#loginEmail").value.trim();if(!x)return toast("Сначала введи почту");try{await sendPasswordResetEmail(auth,x);toast("Письмо отправлено") }catch(e){toast("Не удалось отправить письмо")}};$("#logout").onclick=()=>signOut(auth);
 function close(){$("#modal").classList.add("hidden");$("#modal").classList.remove("user-detail-mode","confirm-cancel-mode","rating-history-mode","origin-open");$("#sheet").innerHTML=""}$("#modal").onclick=e=>{if(e.target.id==="modal"&&!$("#modal").classList.contains("required-profile-mode"))close()};function setup(u){$("#modal").classList.remove("hidden");$("#modal").classList.add("required-profile-mode");$("#sheet").innerHTML=`<h2>Заполни профиль</h2><p class="muted">Это нужно перед первым бронированием.</p><label>Полное ФИО</label><input id="sName" class="input" value="${esc(u.displayName||"")}"><div class="profile-hint">Укажите полное имя так, как оно указано в документах.</div><label>Комната</label><input id="sRoom" class="input" placeholder="3.3.1" type="text" inputmode="text" autocomplete="off"><div class="profile-hint">Формат: этаж.блок.комната. Например, 3.3.2.</div><label>Группа</label><input id="sGroup" class="input" placeholder="1616 или 1616А" maxlength="9" required><div class="profile-hint">Четыре цифры подряд без разделителей; одна буква в конце необязательна.</div><label>Телефон</label><input id="sPhone" class="input"><button id="sSave" class="primary" style="margin-top:14px">Сохранить</button>`;$("#sSave").onclick=async()=>{const name=$("#sName").value.trim(),room=$("#sRoom").value.trim(),group=normalizeGroup($("#sGroup").value),phone=$("#sPhone").value.trim();if(!group)return toast("Укажите группу слитно: четыре цифры и необязательная буква");if(!name||!room||!phone)return toast("Заполни все поля");if(!validRoom(room))return toast(roomError(room));const batch=writeBatch(db);batch.set(doc(db,"users",u.uid),{name,room,group,phone,email:u.email||"",account_verified:false,role:"resident",profile_version:3,created_at:serverTimestamp(),updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",u.uid),{name,room,account_verified:false});await batch.commit();$("#modal").classList.remove("required-profile-mode");close();await loadProfile(u)}}
-async function loadProfile(u){const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()){setup(u);return false}profile={id:s.id,...s.data()};me=u;renderProfile();if(needsProfileUpdate(profile))setTimeout(profileUpdateModal,0);return true}function renderProfile(){document.body.classList.toggle("is-admin",profile.role==="admin");const n=profile.name||"Пользователь",f=n.split(" ")[0]||n;$("#topName").textContent=f;$("#topRole").textContent="Профиль";$("#avatar").textContent=(n[0]||"U").toUpperCase();$("#hello").textContent=`Добрый день, ${f}!`;$("#profileName").textContent=n;$("#profileMeta").textContent=`Комната ${profile.room} · Группа ${profile.group||"—"}`;$("#profileRole").textContent=role(profile.role);$("#pName").textContent=n;$("#pRoom").textContent=profile.room;$("#pGroup").textContent=profile.group||"—";$("#pPhone").textContent=profile.phone;$("#pEmail").textContent=profile.email||me.email||"";const isAdmin=profile.role==="admin";const canStudents=canViewStudents(),canBrs=canViewBrsBase();
+async function loadProfile(u){const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()){const deleted=await getDoc(doc(db,"deleted_users",u.uid));if(deleted.exists()){toast("Этот аккаунт удалён");await signOut(auth);return false}setup(u);return false}profile={id:s.id,...s.data()};me=u;renderProfile();if(needsProfileUpdate(profile))setTimeout(profileUpdateModal,0);return true}function renderProfile(){document.body.classList.toggle("is-admin",profile.role==="admin");const n=profile.name||"Пользователь",f=n.split(" ")[0]||n;$("#topName").textContent=f;$("#topRole").textContent="Профиль";$("#avatar").textContent=(n[0]||"U").toUpperCase();$("#hello").textContent=`Добрый день, ${f}!`;$("#profileName").textContent=n;$("#profileMeta").textContent=`Комната ${profile.room} · Группа ${profile.group||"—"}`;$("#profileRole").textContent=role(profile.role);$("#pName").textContent=n;$("#pRoom").textContent=profile.room;$("#pGroup").textContent=profile.group||"—";$("#pPhone").textContent=profile.phone;$("#pEmail").textContent=profile.email||me.email||"";const isAdmin=profile.role==="admin";const canStudents=canViewStudents(),canBrs=canViewBrsBase();
 $("#adminNav").classList.add("hidden");
 $("#adminNav").disabled=true;
 $("#accountUsers").classList.toggle("hidden",!canStudents);$("#accountBrsRating").classList.toggle("hidden",!canBrs);
@@ -2563,6 +2563,26 @@ const adminUsersPageSize=40;
 const canViewStudents=()=>profile?.role==="admin"||(profile?.role==="student_council"&&profile?.view_students===true);
 const canViewBrsBase=()=>profile?.role==="admin"||(profile?.role==="student_council"&&profile?.view_brs===true);
 
+async function purgeDeletedStudentRecords(uid){
+  const [bookings,history,transactions,audits,views,ownManagerOps]=await Promise.all([
+    getDocs(query(collection(db,"bookings"),where("uid","==",uid))),
+    getDocs(query(collection(db,"booking_history"),where("uid","==",uid))),
+    getDocs(query(collection(db,"brs_transactions"),where("student_uid","==",uid))),
+    getDocs(query(collection(db,"brs_audit"),where("student_uid","==",uid))),
+    getDocs(query(collection(db,"brs_view"),where("student_uid","==",uid))),
+    getDocs(collection(db,"brs_manager_ops",uid,"items"))
+  ]);
+  const refs=new Map();
+  for(const snap of [bookings,history,transactions,audits,views,ownManagerOps])for(const d of snap.docs)refs.set(d.ref.path,d.ref);
+  const managerIds=[...new Set(audits.docs.map(d=>d.data().created_by).filter(Boolean))].filter(id=>id!==uid);
+  const managerCopies=await Promise.all(managerIds.map(id=>getDocs(query(collection(db,"brs_manager_ops",id,"items"),where("student_uid","==",uid)))));
+  for(const snap of managerCopies)for(const d of snap.docs)refs.set(d.ref.path,d.ref);
+  const brsProfile=doc(db,"brs_profiles",uid);refs.set(brsProfile.path,brsProfile);
+  const all=[...refs.values()];
+  for(let i=0;i<all.length;i+=350){const batch=writeBatch(db);for(const ref of all.slice(i,i+350))batch.delete(ref);await batch.commit()}
+  return all.length;
+}
+
 function renderAdminUsers(){
   const q=($("#adminUserSearch")?.value||"").trim().toLowerCase();
   const status=$("#adminVerifiedFilter")?.value||"all";
@@ -2700,42 +2720,33 @@ function renderAdminUsers(){
     for(const [id,key] of [["detailBrsManage","brs_manage"],["detailBrsCancel","brs_cancel"],["detailViewStudents","view_students"],["detailViewBrs","view_brs"]]){const el=$("#"+id);if(el)el.onchange=async()=>{if(profile.role!=="admin"||user.role!=="student_council"){el.checked=!el.checked;return}const value=el.checked;try{await updateDoc(doc(db,"users",user.id),{[key]:value,updated_at:serverTimestamp()});user[key]=value;toast("Право обновлено")}catch(e){el.checked=!value;toast("Не удалось изменить право")}}}
   });
 
-  $$("[data-delete-user]").forEach(btn=>btn.onclick=()=>{
-    if(profile.role!=="admin")return;
-    const user=adminUsersCache.find(u=>u.id===btn.dataset.deleteUser);
-    if(!user) return;
-    $("#modal").classList.remove("hidden");
-    $("#sheet").innerHTML=`
-      <h2>Удалить пользователя?</h2>
-      <p class="muted">${esc(user.name||"Пользователь")} · комната ${esc(user.room||"—")}</p>
-      <div class="delete-warning">
-        Профиль и активные бронирования будут удалены из Firestore. История отмен останется.
-      </div>
-      <div class="sheet-actions">
-        <button id="deleteUserCancel" class="secondary">Отмена</button>
-        <button id="deleteUserConfirm" class="primary delete-confirm">Удалить</button>
-      </div>`;
-    $("#deleteUserCancel").onclick=close;
-    $("#deleteUserConfirm").onclick=async()=>{
-      try{
-        if(profile.role!=="admin") throw new Error("not_admin");
-        if(user.id===me.uid) throw new Error("self");
-
-        const bookingSnap=await getDocs(query(collection(db,"bookings"),where("uid","==",user.id)));
-        const batch=writeBatch(db);
-        bookingSnap.docs.forEach(d=>batch.delete(d.ref));
-        batch.delete(doc(db,"users",user.id));
-        await batch.commit();
-
-        adminUsersCache=adminUsersCache.filter(u=>u.id!==user.id);
-        close();
-        renderAdminUsers();
-        toast("Пользователь удалён из базы");
-      }catch(e){
-        toast("Не удалось удалить пользователя");
-      }
-    };
-  });
+$$("[data-delete-user]").forEach(btn=>btn.onclick=()=>{
+  if(profile.role!=="admin")return;
+  const user=adminUsersCache.find(u=>u.id===btn.dataset.deleteUser);
+  if(!user)return;
+  $("#modal").classList.remove("hidden");
+  $("#sheet").innerHTML=`<h2>Удалить пользователя и его данные?</h2><p class="muted">${esc(user.name||"Пользователь")} · комната ${esc(user.room||"—")}</p><div class="delete-warning">Будут безвозвратно удалены профиль, записи на стирку, история отмен, начисления и списания БРС, включая отменённые операции. Повторный вход не восстановит профиль.</div><div class="sheet-actions"><button id="deleteUserCancel" class="secondary">Отмена</button><button id="deleteUserConfirm" class="primary delete-confirm">Удалить всё</button></div>`;
+  $("#deleteUserCancel").onclick=close;
+  $("#deleteUserConfirm").onclick=async()=>{
+    const button=$("#deleteUserConfirm");button.disabled=true;button.textContent="Удаляем…";
+    let accountRemoved=false;
+    try{
+      if(profile.role!=="admin"||user.id===me.uid)throw new Error("not_allowed");
+      const batch=writeBatch(db);
+      batch.set(doc(db,"deleted_users",user.id),{deleted_at:serverTimestamp()});
+      batch.delete(doc(db,"users",user.id));
+      await batch.commit();
+      accountRemoved=true;
+      await purgeDeletedStudentRecords(user.id);
+      adminUsersCache=adminUsersCache.filter(u=>u.id!==user.id);
+      adminBrsRatingUsers=adminBrsRatingUsers.filter(u=>u.id!==user.id);
+      adminBrsRatingTx=adminBrsRatingTx.filter(t=>t.student_uid!==user.id);
+      brsUsers=brsUsers.filter(u=>u.id!==user.id);
+      close();renderAdminUsers();toast("Данные пользователя удалены");
+    }catch(e){console.error("User deletion failed:",e);if(accountRemoved){adminUsersCache=adminUsersCache.filter(u=>u.id!==user.id);close();renderAdminUsers();toast("Профиль удалён, но очистка истории не завершена. Запустите очистку удалённых жильцов")}
+      else{button.disabled=false;button.textContent="Удалить всё";toast("Не удалось удалить пользователя")}}
+  };
+});
 
   if($("#adminPrev"))$("#adminPrev").onclick=()=>{adminUsersPage--;renderAdminUsers();window.scrollTo(0,0)};
   if($("#adminNext"))$("#adminNext").onclick=()=>{adminUsersPage++;renderAdminUsers();window.scrollTo(0,0)};
@@ -2756,7 +2767,7 @@ async function adminUsers(){
   }
 }
 
-async function adminHistory(){if(profile?.role!=="admin")return;$("#adminHistory").innerHTML='<div class="loader">Загружаем…</div>';try{const s=await getDocs(query(collection(db,'booking_history'),orderBy('cancelled_at','desc'),limit(100))),a=s.docs.map(d=>d.data());$("#adminHistory").innerHTML=a.length?a.map(b=>`<div class="glass item"><div class="item-title">${fmt(b.date)} · ${b.start_time} · машина №${b.machine_number}</div><div class="meta">${esc(b.name)} · комната ${esc(b.room)} · ${esc(b.phone)}<br>Статус: отменено</div></div>`).join(''):'<div class="glass empty">История пока пустая</div>'}catch(e){$("#adminHistory").innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}}const adminSearch=$("#adminUserSearch");
+async function adminHistory(){if(profile?.role!=="admin")return;$("#adminHistory").innerHTML='<div class="loader">Загружаем…</div>';try{const [s,liveUsers]=await Promise.all([getDocs(query(collection(db,'booking_history'),orderBy('cancelled_at','desc'),limit(100))),getDocs(collection(db,'users'))]),liveIds=new Set(liveUsers.docs.map(d=>d.id)),a=s.docs.map(d=>d.data()).filter(b=>liveIds.has(b.uid));$("#adminHistory").innerHTML=a.length?a.map(b=>`<div class="glass item"><div class="item-title">${fmt(b.date)} · ${b.start_time} · машина №${b.machine_number}</div><div class="meta">${esc(b.name)} · комната ${esc(b.room)} · ${esc(b.phone)}<br>Статус: отменено</div></div>`).join(''):'<div class="glass empty">История пока пустая</div>'}catch(e){$("#adminHistory").innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}}const adminSearch=$("#adminUserSearch");
 if($("#adminVerifiedFilter"))$("#adminVerifiedFilter").onchange=()=>{adminUsersPage=0;renderAdminUsers()};
 if(adminSearch){
   adminSearch.addEventListener("input",()=>{adminUsersPage=0;renderAdminUsers()});
@@ -2891,6 +2902,7 @@ async function ensureBrsViews(users,transactions){
 async function openAdminBrsRating(){
   if(!canViewBrsBase())return;
   $("#exportBrsRatingExcel").classList.toggle("hidden",profile.role!=="admin");
+  $("#cleanupDeletedUsers").classList.toggle("hidden",profile.role!=="admin");
   currentModule="laundry";
   $$(".brs-page").forEach(x=>x.classList.add("hidden"));
   ["schedulePage","myPage","profilePage","adminPage"].forEach(id=>$("#"+id)?.classList.add("hidden"));
@@ -2913,6 +2925,8 @@ async function openAdminBrsRating(){
     ]);
     adminBrsRatingUsers=us.docs.map(d=>({id:d.id,...d.data()}));
     adminBrsRatingTx=ts.docs.map(d=>({id:d.id,...d.data()}));
+    const activeUserIds=new Set(adminBrsRatingUsers.map(u=>u.id));
+    adminBrsRatingTx=adminBrsRatingTx.filter(t=>activeUserIds.has(t.student_uid));
     if(profile.role==="admin")await ensureBrsViews(adminBrsRatingUsers,adminBrsRatingTx);
     const totals=new Map();
     adminBrsRatingTx.forEach(t=>{
@@ -3046,7 +3060,7 @@ function exportAdminBrsRatingExcel(){
     const users=[...adminBrsRatingUsers].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ru"));
     const byId=new Map(users.map(u=>[u.id,u]));
     const totals=new Map(users.map(u=>[u.id,{positive:0,negative:0}]));
-    const entries=adminBrsRatingTx.filter(activeBrsExportTx).sort((a,b)=>Number(a.created_ms||0)-Number(b.created_ms||0));
+    const entries=adminBrsRatingTx.filter(t=>byId.has(t.student_uid)&&activeBrsExportTx(t)).sort((a,b)=>Number(a.created_ms||0)-Number(b.created_ms||0));
     for(const t of entries){const score=totals.get(t.student_uid);if(!score)continue;const points=Number(t.points);if(points>0)score.positive+=points;else score.negative+=points}
     const summary=[["№","ФИО","Группа","Комната / блок","Поощрения","Нарушения (баллы)","Итог","Статус"]];
     const rankedUsers=[...users].sort((a,b)=>{const as=totals.get(a.id),bs=totals.get(b.id);return (bs.positive+bs.negative)-(as.positive+as.negative)||String(a.name||"").localeCompare(String(b.name||""),"ru")});
@@ -3065,6 +3079,29 @@ function exportAdminBrsRatingExcel(){
     toast("Excel-файл сформирован");
   }catch(e){console.error("Excel export failed:",e);toast("Не удалось экспортировать рейтинг")}
 }
+$("#cleanupDeletedUsers").onclick=async()=>{
+  if(profile?.role!=="admin")return;
+  const btn=$("#cleanupDeletedUsers");btn.disabled=true;btn.textContent="Проверяем…";
+  try{
+    const [users,audits,tx,views,profiles,history]=await Promise.all([
+      getDocs(collection(db,"users")),getDocs(collection(db,"brs_audit")),
+      getDocs(collection(db,"brs_transactions")),getDocs(collection(db,"brs_view")),
+      getDocs(collection(db,"brs_profiles")),getDocs(collection(db,"booking_history"))
+    ]);
+    const liveIds=new Set(users.docs.map(d=>d.id));
+    const missing=new Set();
+    for(const snap of [audits,tx,views])for(const d of snap.docs){const uid=d.data().student_uid;if(uid&&!liveIds.has(uid))missing.add(uid)}
+    for(const d of profiles.docs)if(!liveIds.has(d.id))missing.add(d.id);
+    for(const d of history.docs){const uid=d.data().uid;if(uid&&!liveIds.has(uid))missing.add(uid)}
+    if(!missing.size){toast("Данных удалённых жильцов не найдено");return}
+    $("#modal").classList.remove("hidden");
+    $("#sheet").innerHTML=`<h2>Очистить данные удалённых жильцов?</h2><p class="muted">Найдено аккаунтов: ${missing.size}. Их история стирки и операции БРС будут удалены без возможности восстановления.</p><div class="sheet-actions"><button id="cleanupNo" class="secondary">Отмена</button><button id="cleanupYes" class="primary delete-confirm">Очистить</button></div>`;
+    $("#cleanupNo").onclick=close;
+    $("#cleanupYes").onclick=async()=>{const yes=$("#cleanupYes");yes.disabled=true;yes.textContent="Очищаем…";try{for(const uid of missing)await purgeDeletedStudentRecords(uid);close();toast("История удалённых жильцов очищена");openAdminBrsRating()}catch(e){console.error("Orphan cleanup failed:",e);yes.disabled=false;yes.textContent="Повторить очистку";toast("Очистка не завершена")}};
+  }catch(e){console.error("Orphan scan failed:",e);toast("Не удалось проверить старые записи")}
+  finally{btn.disabled=false;btn.textContent="Очистить данные удалённых жильцов"}
+};
+
 $("#exportBrsRatingExcel").onclick=exportAdminBrsRatingExcel;
 
 $("#brsRatingSearch").oninput=()=>{brsRatingPage=0;renderAdminBrsRating()};
@@ -3079,7 +3116,7 @@ function monthSum(a){const d=new Date(),key=`${d.getFullYear()}-${pad(d.getMonth
 function txHtml(t,adminExtra="",clickable=true){const p=Number(t.points||0);return `<div class="glass brs-tx ${t.cancelled?'brs-cancelled':''}" ${clickable?`data-tx="${esc(t.id||'')}"`:''}><div class="brs-tx-top"><div><div class="brs-reason">${esc(t.reason_name||"Без основания")}</div><div class="brs-meta">${esc(t.student_name||"")}${t.student_room?` · комната ${esc(t.student_room)}`:""}<br>${esc(t.created_label||t.created_date||"")}${t.cancelled?" · отменено":""}${adminExtra}</div></div><div class="brs-points ${p>=0?'pos':'neg'}">${p>0?'+':''}${p}</div></div>${t.comment?`<div class="brs-meta" style="margin-top:8px">${esc(t.comment)}</div>`:""}</div>`}
 function russianCount(n,one,few,many){const a=Math.abs(Number(n)),m=a%100;if(m>=11&&m<=14)return many;const d=a%10;return d===1?one:d>=2&&d<=4?few:many}
 async function renderBrsHome(){const personal=$("#brsPersonal"),work=$("#brsWork");personal.innerHTML='<div class="loader">Загружаем баллы…</div>';work.innerHTML="";try{const tx=await getPublicTxFor(me.uid),score=txSum(tx),month=monthSum(tx);personal.innerHTML=`<div class="glass brs-score brs-manager-card"><div class="who">${esc(profile.name||"Пользователь")}</div><div class="score">${score} ${russianCount(score,"балл","балла","баллов")}</div><div class="month">За этот месяц: ${month>0?'+':''}${month}</div><button id="myBrsHistory" class="small" style="margin-top:12px">Посмотреть мою историю →</button></div>`;$("#myBrsHistory").onclick=()=>{brsHistoryMode="received";brsPage("history")};if(brsManager()){const users=await getBrsUsers();work.innerHTML=`<div class="glass brs-search"><div class="item-title">Управление БРС</div><div class="meta">${users.length} ${russianCount(users.length,"жилец","жильца","жильцов")} · быстрый поиск и операции</div><div class="brs-actions"><button id="quickPlus" class="brs-plus">+ Начислить</button><button id="quickMinus" class="brs-minus">− Списать</button></div></div>`;$("#quickPlus").onclick=()=>{brsOperationSign=1;brsPage("operation")};$("#quickMinus").onclick=()=>{brsOperationSign=-1;brsPage("operation")}}}catch(e){personal.innerHTML='<div class="glass empty">Не удалось загрузить БРС. Проверь правила Firestore.</div>'}}
-async function renderBrsHistory(){const box=$("#brsHistory");box.innerHTML='<div class="loader">Загружаем…</div>';try{if(profile.role==="admin"){box.innerHTML=`<div class="brs-segment"><button id="histMine" class="${brsHistoryMode==='received'?'active':''}">Моя история</button><button id="histOps" class="${brsHistoryMode==='ops'?'active':''}">Операции БРС</button></div><div id="brsHistBody"></div>`;$("#histMine").onclick=()=>{brsHistoryMode="received";renderBrsHistory()};$("#histOps").onclick=()=>{brsHistoryMode="ops";renderBrsHistory()};if(brsHistoryMode==="received"){const a=await getPublicTxFor(me.uid);$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>';return}const audits=await getDocs(collection(db,"brs_audit")),arr=audits.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0));$("#brsHistBody").innerHTML=`<div class="glass brs-search"><input id="brsAuditSearch" class="input" type="search" placeholder="ФИО, комната или управляющий"></div><div id="brsAuditList" class="brs-list"></div>`;const draw=()=>{const q=$("#brsAuditSearch").value.trim().toLowerCase(),a=arr.filter(x=>!q||`${x.student_name||''} ${x.student_room||''} ${x.created_by_name||''}`.toLowerCase().includes(q));$("#brsAuditList").innerHTML=a.length?a.map(x=>txHtml(x,`<br>Выполнил: ${esc(x.created_by_name||'—')}`)).join(""):'<div class="glass empty">Ничего не найдено</div>';bindTxClicks(a,"audit")};$("#brsAuditSearch").oninput=draw;draw();return}if(brsManager()){box.innerHTML=`<div class="brs-segment"><button class="${brsHistoryMode==='received'?'active':''}" id="histMine">Моя история</button><button class="${brsHistoryMode==='ops'?'active':''}" id="histOps">Мои операции</button></div><div id="brsHistBody"></div>`;$("#histMine").onclick=()=>{brsHistoryMode="received";renderBrsHistory()};$("#histOps").onclick=()=>{brsHistoryMode="ops";renderBrsHistory()};if(brsHistoryMode==="ops"){const snap=await getDocs(collection(db,"brs_manager_ops",me.uid,"items")),a=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0));$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x)).join(""):'<div class="glass empty">Вы ещё не проводили операций</div>';bindTxClicks(a,"mine")}else{const a=await getPublicTxFor(me.uid);$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>'}return}const a=await getPublicTxFor(me.uid);box.innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>'}catch(e){box.innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}}
+async function renderBrsHistory(){const box=$("#brsHistory");box.innerHTML='<div class="loader">Загружаем…</div>';try{if(profile.role==="admin"){box.innerHTML=`<div class="brs-segment"><button id="histMine" class="${brsHistoryMode==='received'?'active':''}">Моя история</button><button id="histOps" class="${brsHistoryMode==='ops'?'active':''}">Операции БРС</button></div><div id="brsHistBody"></div>`;$("#histMine").onclick=()=>{brsHistoryMode="received";renderBrsHistory()};$("#histOps").onclick=()=>{brsHistoryMode="ops";renderBrsHistory()};if(brsHistoryMode==="received"){const a=await getPublicTxFor(me.uid);$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>';return}const [audits,liveUsers]=await Promise.all([getDocs(collection(db,"brs_audit")),getDocs(collection(db,"users"))]),liveIds=new Set(liveUsers.docs.map(d=>d.id)),arr=audits.docs.map(d=>({id:d.id,...d.data()})).filter(t=>liveIds.has(t.student_uid)).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0));$("#brsHistBody").innerHTML=`<div class="glass brs-search"><input id="brsAuditSearch" class="input" type="search" placeholder="ФИО, комната или управляющий"></div><div id="brsAuditList" class="brs-list"></div>`;const draw=()=>{const q=$("#brsAuditSearch").value.trim().toLowerCase(),a=arr.filter(x=>!q||`${x.student_name||''} ${x.student_room||''} ${x.created_by_name||''}`.toLowerCase().includes(q));$("#brsAuditList").innerHTML=a.length?a.map(x=>txHtml(x,`<br>Выполнил: ${esc(x.created_by_name||'—')}`)).join(""):'<div class="glass empty">Ничего не найдено</div>';bindTxClicks(a,"audit")};$("#brsAuditSearch").oninput=draw;draw();return}if(brsManager()){box.innerHTML=`<div class="brs-segment"><button class="${brsHistoryMode==='received'?'active':''}" id="histMine">Моя история</button><button class="${brsHistoryMode==='ops'?'active':''}" id="histOps">Мои операции</button></div><div id="brsHistBody"></div>`;$("#histMine").onclick=()=>{brsHistoryMode="received";renderBrsHistory()};$("#histOps").onclick=()=>{brsHistoryMode="ops";renderBrsHistory()};if(brsHistoryMode==="ops"){const snap=await getDocs(collection(db,"brs_manager_ops",me.uid,"items")),a=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_ms||0)-(a.created_ms||0));$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x)).join(""):'<div class="glass empty">Вы ещё не проводили операций</div>';bindTxClicks(a,"mine")}else{const a=await getPublicTxFor(me.uid);$("#brsHistBody").innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>'}return}const a=await getPublicTxFor(me.uid);box.innerHTML=a.length?a.map(x=>txHtml(x,"",false)).join(""):'<div class="glass empty">История пока пустая</div>'}catch(e){box.innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}}
 function bindTxClicks(arr,mode){$$('[data-tx]').forEach(el=>el.onclick=()=>{const t=arr.find(x=>x.id===el.dataset.tx);if(t)openBrsTx(t,mode)})}
 function openBrsTx(t,mode){const canCancel=!t.cancelled&&(profile.role==="admin"||(brsCanceller()&&mode==="mine"));$("#modal").classList.remove("hidden");$("#sheet").innerHTML=`<h2>Операция БРС</h2><div class="user-detail-grid"><div class="user-detail-field full"><span>Житель</span><b>${esc(t.student_name||'—')}</b></div><div class="user-detail-field"><span>Комната</span><b>${esc(t.student_room||'—')}</b></div><div class="user-detail-field"><span>Баллы</span><b>${Number(t.points)>0?'+':''}${Number(t.points||0)}</b></div><div class="user-detail-field full"><span>Основание</span><b>${esc(t.reason_name||'—')}</b></div>${profile.role==='admin'?`<div class="user-detail-field full"><span>Выполнил</span><b>${esc(t.created_by_name||'—')}</b></div>`:''}<div class="user-detail-field full"><span>Дата</span><b>${esc(t.created_label||t.created_date||'—')}</b></div>${t.comment?`<div class="user-detail-field full"><span>Комментарий</span><b>${esc(t.comment)}</b></div>`:''}</div>${t.cancelled?'<div class="confirm-note">Операция отменена</div>':canCancel?'<button id="cancelBrsTx" class="secondary danger" style="margin-top:14px">Отменить операцию</button>':''}<button id="closeBrsTx" class="secondary" style="margin-top:9px">Закрыть</button>`;$("#closeBrsTx").onclick=close;if($("#cancelBrsTx"))$("#cancelBrsTx").onclick=()=>cancelBrsTx(t,mode)}
 function cancelBrsTx(t,mode){if(!(profile.role==="admin"||(brsCanceller()&&mode==="mine")))return;$("#sheet").innerHTML=`<h2>Отменить операцию?</h2><p class="muted">${esc(t.reason_name||'Операция')} · ${esc(t.student_name||'')}</p><label>Причина отмены</label><textarea id="cancelBrsReason" class="input" rows="3" placeholder="Укажите причину"></textarea><div class="sheet-actions"><button id="cancelBrsNo" class="secondary">Назад</button><button id="cancelBrsYes" class="primary cancel-danger">Отменить операцию</button></div>`;$("#cancelBrsNo").onclick=()=>openBrsTx(t,mode);$("#cancelBrsYes").onclick=async()=>{const reason=$("#cancelBrsReason").value.trim();if(!reason)return toast("Укажите причину отмены");const b=$("#cancelBrsYes");b.disabled=true;b.textContent="Отменяем…";try{const data={cancelled:true,cancelled_by:me.uid,cancelled_by_name:profile.name||'',cancelled_reason:reason,cancelled_at:serverTimestamp()};const batch=writeBatch(db);batch.update(doc(db,"brs_transactions",t.id),data);batch.update(doc(db,"brs_audit",t.id),data);batch.update(doc(db,"brs_view",t.id),{cancelled:true});if(mode==="mine")batch.update(doc(db,"brs_manager_ops",me.uid,"items",t.id),data);else if(profile.role==="admin"&&t.created_by)batch.update(doc(db,"brs_manager_ops",t.created_by,"items",t.id),data);await batch.commit();close();toast("Операция отменена");renderBrsHistory()}catch(e){b.disabled=false;b.textContent="Отменить операцию";toast("Не удалось отменить операцию")}}}
