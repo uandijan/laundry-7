@@ -2582,6 +2582,7 @@ function renderAdminUsers(){
     const hay=[
       u.name||"",
       u.room||"",
+      u.group||"",
       u.phone||"",
       u.email||"",
       role(u.role)||""
@@ -2602,8 +2603,8 @@ function renderAdminUsers(){
           <span class="verification-badge ${u.account_verified===true?"is-verified":"is-unverified"}">${u.account_verified===true?"Подтверждён":"Не подтверждён"}</span>
           <div class="item-title">${esc(u.name||"Без имени")}${u.id!==me.uid&&u.resident_badge?` <span class="resident-badge-inline">${esc(u.resident_badge)}</span>`:""}</div>
           <div class="meta">
-            Комната ${esc(u.room||"—")} · ${esc(u.phone||"—")}<br>
-            ${esc(u.email||"")}
+            Комната ${esc(u.room||"—")} · Группа ${esc(u.group||"—")}<br>
+            ${esc(u.phone||"—")}${u.email?` · ${esc(u.email)}`:""}
           </div>
         </div>
         ${profile.role!=="admin"||u.id===me.uid
@@ -2658,9 +2659,10 @@ function renderAdminUsers(){
         <button id="userDetailClose" class="user-detail-close" type="button">×</button>
       </div>
 
-      ${user.role!=="admin"&&(profile.role==="admin"||user.id!==me.uid)?`<div class="glass item verification-panel"><div class="brs-switch-row"><div><b>Подтверждение аккаунта</b><div class="meta">Данные жильца проверены</div></div><label class="ios-switch" aria-label="Подтвердить аккаунт"><input id="detailVerified" type="checkbox" ${user.account_verified===true?"checked":""}><span></span></label></div></div>`:""}
+      ${profile.role==="admin"||(user.role!=="admin"&&user.id!==me.uid)?`<div class="glass item verification-panel"><div class="brs-switch-row"><div><b>Подтверждение аккаунта</b><div class="meta">Данные жильца проверены</div></div><label class="ios-switch" aria-label="Подтвердить аккаунт"><input id="detailVerified" type="checkbox" ${user.account_verified===true?"checked":""}><span></span></label></div></div>`:""}
       <div class="user-detail-grid">
         <div class="user-detail-field"><span>Комната</span><b>${esc(user.room||"—")}</b></div>
+        <div class="user-detail-field"><span>Группа</span><b>${esc(user.group||"—")}</b></div>
         <div class="user-detail-field"><span>Телефон</span><b>${esc(user.phone||"—")}</b></div>
         <div class="user-detail-field full"><span>Почта</span><b>${esc(user.email||"—")}</b></div>
         <div class="user-detail-field full"><span>Роль</span><b>${esc(role(user.role))}</b></div>
@@ -2681,7 +2683,7 @@ function renderAdminUsers(){
       </div>`;
     animateSheetFrom(card);
     $("#userDetailClose").onclick=close;
-    if($("#detailVerified"))$("#detailVerified").onchange=async e=>{if(!canViewStudents()){e.target.checked=!e.target.checked;return}const value=e.target.checked;try{const batch=writeBatch(db);batch.update(doc(db,"users",user.id),{account_verified:value,updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",user.id),brsProfileData({...user,account_verified:value}));await batch.commit();user.account_verified=value;const badge=$("#userDetailVerified");if(badge){badge.classList.toggle("is-verified",value);badge.classList.toggle("is-unverified",!value);badge.textContent=value?"Подтверждён":"Не подтверждён"}renderAdminUsers();toast(value?"Аккаунт подтверждён":"Подтверждение снято")}catch(err){e.target.checked=!value;toast("Не удалось сохранить подтверждение")}};
+    if($("#detailVerified"))$("#detailVerified").onchange=async e=>{if(!canViewStudents()){e.target.checked=!e.target.checked;return}const value=e.target.checked;try{const batch=writeBatch(db);batch.update(doc(db,"users",user.id),{account_verified:value,updated_at:serverTimestamp()});batch.set(doc(db,"brs_profiles",user.id),brsProfileData({...user,account_verified:value}));await batch.commit();user.account_verified=value;if(user.id===me.uid)profile.account_verified=value;const badge=$("#userDetailVerified");if(badge){badge.classList.toggle("is-verified",value);badge.classList.toggle("is-unverified",!value);badge.textContent=value?"Подтверждён":"Не подтверждён"}renderAdminUsers();toast(value?"Аккаунт подтверждён":"Подтверждение снято")}catch(err){e.target.checked=!value;toast("Не удалось сохранить подтверждение")}};
     if($("#residentBadgeInput"))$("#residentBadgeInput").oninput=e=>{$("#residentBadgePreview").textContent=e.target.value.trim()||"🙂"};
     if($("#clearResidentBadge"))$("#clearResidentBadge").onclick=()=>{$("#residentBadgeInput").value="";$("#residentBadgePreview").textContent="🙂"};
     if($("#saveResidentBadge"))$("#saveResidentBadge").onclick=async()=>{
