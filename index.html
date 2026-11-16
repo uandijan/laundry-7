@@ -2435,7 +2435,7 @@ function bookingRecentlyFinished(s,h){const n=moscow();if(s!==n.date)return fals
 function active(b){const st=String(b?.start_time||"");const h=parseInt(st.slice(0,2),10);return !!b?.date&&Number.isFinite(h)&&!cutoff(b.date,h)}function id(date,h,m){return`${date}_${pad(h)}00_m${m}`}
 function validRoom(v){const m=String(v||"").trim().match(/^(\d{1,2})\.(\d)\.(\d)$/);if(!m)return false;const floor=+m[1],block=+m[2],room=+m[3];return floor>=2&&floor<=16&&block>=1&&block<=5&&room>=1&&room<=(block===5?4:2)}
 function roomError(v){const x=String(v||"").trim();const m=x.match(/^(\d{1,2})\.(\d)\.(\d)$/);if(!m)return"Формат комнаты: этаж.блок.комната — например, 2.3.2";if(+m[1]<2||+m[1]>16)return"Жилой этаж должен быть от 2 до 16";if(+m[2]<1||+m[2]>5)return"Блок должен быть от 1 до 5";const maxRoom=+m[2]===5?4:2;if(+m[3]<1||+m[3]>maxRoom)return +m[2]===5?"В 5 блоке комнаты 1–4":"В блоках 1–4 только комнаты 1 и 2";return""}
-function normalizeGroup(value){const group=String(value||"").toUpperCase();if(group==="ОРДИНАТОР")return "ординатор";return /^\d{4}[A-ZА-ЯЁ]?$/u.test(group)?group:""}
+function normalizeGroup(value){const group=String(value||"").toUpperCase();if(group==="ОРДИНАТОР")return "ординатор";if(group==="IEP25")return "IEP25";return /^\d{4}[A-ZА-ЯЁ]?$/u.test(group)?group:""}
 function validGroup(value){return normalizeGroup(value)!==""}
 function needsProfileUpdate(p){return Number(p?.profile_version||0)<2||!validRoom(p?.room)||!validGroup(p?.group)}
 async function saveMyProfile(data){const next={...profile,...data};const batch=writeBatch(db);batch.update(doc(db,"users",me.uid),data);batch.set(doc(db,"brs_profiles",me.uid),brsProfileData(next));await batch.commit()}
