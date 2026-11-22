@@ -2418,7 +2418,7 @@ body{background:transparent!important}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";import{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,collection,query,where,onSnapshot,runTransaction,writeBatch,serverTimestamp,orderBy,limit}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";import{getAuth,GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";import{getFunctions,httpsCallable}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";import{getFirestore,doc,getDoc,getDocs,setDoc,updateDoc,collection,query,where,onSnapshot,writeBatch,serverTimestamp,orderBy,limit}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";import{getAuth,GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";import{getFunctions,httpsCallable}from"https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js";
 const firebaseConfig={apiKey:"AIzaSyDForvSsN1cMgEtHNFUIXTUmua3XTl6Lys",authDomain:"laundry-7.firebaseapp.com",projectId:"laundry-7",storageBucket:"laundry-7.firebasestorage.app",messagingSenderId:"765868065792",appId:"1:765868065792:web:1c30e2b1b9d67afaeff84e5",measurementId:"G-E5MJCGJ0EP"};const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),functions=getFunctions(app),provider=new GoogleAuthProvider();try{await setPersistence(auth,browserLocalPersistence)}catch(e){console.warn("Persistent sign-in unavailable; continuing with browser default",e)}const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],M=[1,2,3,4,5],H=Array.from({length:17},(_,i)=>i+6);let me=null,profile=null,selectedDate=null,unsub=null,multiMode=false,multiSelected=new Set();const pad=n=>String(n).padStart(2,"0"),ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,dateFrom=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)},esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));function toast(x){const t=$("#toast");t.textContent=x;t.classList.remove("hidden");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add("hidden"),2600)}function role(r){return r==="admin"?"Администратор":r==="student_council"?"Студсовет":"Житель"}function moscow(){const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Moscow",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()),o={};p.forEach(x=>o[x.type]=x.value);return{date:`${o.year}-${o.month}-${o.day}`,hour:+o.hour,minute:+o.minute}}function allowedDates(){const n=moscow(),b=dateFrom(n.date),w=b.getDay(),offs=w===4?[0,1,2,3]:w===5?[0,1,2]:w===6?[0,1]:[0,1];return offs.map(x=>{const d=new Date(b);d.setDate(d.getDate()+x);return ymd(d)})}function weekend(s){const d=dateFrom(s).getDay();return d===0||d===6}function canWeekend(){return["student_council","admin"].includes(profile?.role)}function cutoff(s,h){const n=moscow();if(s<n.date)return true;if(s>n.date)return false;return n.hour*60+n.minute>=h*60+30}
 function bookingStillVisible(s,h){const n=moscow();if(s<n.date)return false;if(s>n.date)return true;return n.hour*60+n.minute<h*60+120}
 async function refreshNextBooking(){
@@ -2471,26 +2471,41 @@ $("#bottom").style.gridTemplateColumns="repeat(3,minmax(0,1fr))";
 if(!canStudents && !$("#adminPage").classList.contains("hidden")) page("schedule");
 }
 $("#editProfile").onclick=()=>{$("#modal").classList.remove("hidden");$("#sheet").innerHTML=`<h2>Личные данные</h2><label>ФИО</label><input id="eName" class="input" value="${esc(profile.name)}"><label>Комната</label><input id="eRoom" class="input" value="${esc(profile.room)}" placeholder="3.3.1" type="text" inputmode="text" autocomplete="off"><div class="profile-hint">Формат: этаж.блок.комната. Например, 3.3.1.</div><label>Группа</label><input id="eGroup" class="input" value="${esc(profile.group||"")}" placeholder="1616 или 1616А" required><div class="profile-hint">Четыре цифры подряд без разделителей; одна буква в конце необязательна.</div><label>Телефон</label><input id="ePhone" class="input" value="${esc(profile.phone)}"><div class="sheet-actions"><button id="eCancel" class="secondary">Отмена</button><button id="eSave" class="primary">Сохранить</button></div>`;$("#eCancel").onclick=close;$("#eSave").onclick=async()=>{const name=$("#eName").value.trim(),room=$("#eRoom").value.trim(),group=normalizeGroup($("#eGroup").value),phone=$("#ePhone").value.trim();if(!group)return toast("Укажите группу");if(!name||!room||!phone)return toast("Заполни все поля");if(!validRoom(room))return toast(roomError(room));const changed=name!==profile.name||room!==profile.room||phone!==profile.phone;await saveMyProfile({name,room,group,phone,...(changed?{account_verified:false}:{}),profile_version:3,updated_at:serverTimestamp()});profile={...profile,name,room,group,phone,...(changed?{account_verified:false}:{}),profile_version:3};renderProfile();close();toast("Профиль обновлён")}};
-function renderDates(){const ds=allowedDates();if(!selectedDate||!ds.includes(selectedDate))selectedDate=ds[0];$("#dates").innerHTML=ds.map(s=>{const d=dateFrom(s),w=new Intl.DateTimeFormat("ru-RU",{weekday:"short"}).format(d).replace(".","");return`<button class="date-chip ${s===selectedDate?"active":""}" data-date="${s}"><small>${w}</small><b>${d.getDate()}</b></button>`}).join("");$$('.date-chip').forEach(b=>b.onclick=()=>{selectedDate=b.dataset.date;multiSelected.clear();$$('.date-chip').forEach(chip=>chip.classList.toggle('active',chip===b));watch()})}let badgeUsersCache=[];
-async function ensureBadgeUsers(){
-  if(!canViewStudents())return;
-  if(badgeUsersCache.length)return;
-  try{const s=await getDocs(collection(db,"users"));badgeUsersCache=s.docs.map(d=>({id:d.id,...d.data()}))}
-  catch(e){console.warn("Badge profiles unavailable",e)}
+function renderDates(){const ds=allowedDates();if(!selectedDate||!ds.includes(selectedDate))selectedDate=ds[0];$("#dates").innerHTML=ds.map(s=>{const d=dateFrom(s),w=new Intl.DateTimeFormat("ru-RU",{weekday:"short"}).format(d).replace(".","");return`<button class="date-chip ${s===selectedDate?"active":""}" data-date="${s}"><small>${w}</small><b>${d.getDate()}</b></button>`}).join("");$$('.date-chip').forEach(b=>b.onclick=()=>{selectedDate=b.dataset.date;multiSelected.clear();$$('.date-chip').forEach(chip=>chip.classList.toggle('active',chip===b));watch()})}let stopOwnLaundry = null;
+let ownLaundry = new Map();
+let visibleLaundrySlots = null;
+function watch(){
+  unsub?.();
+  stopOwnLaundry?.();
+  ownLaundry = new Map();
+  const date = selectedDate;
+  const uid = me.uid;
+  visibleLaundrySlots = null;
+  const isCurrent = () => selectedDate === date && me?.uid === uid;
+  const bookings = collection(db, 'bookings');
+  const schedule = collection(db, 'laundry_slots');
+  $("#scheduleGrid").innerHTML = '<div class="loader">Загружаем…</div>';
+  unsub = onSnapshot(query(schedule, where('date', '==', date)), snapshot => {
+    if (!isCurrent()) return;
+    visibleLaundrySlots = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+    renderSchedule(visibleLaundrySlots);
+  }, () => {
+    if (!isCurrent()) return;
+    visibleLaundrySlots = null;
+    $("#scheduleGrid").innerHTML = '<div class="glass empty">Не удалось загрузить расписание</div>';
+  });
+  stopOwnLaundry = onSnapshot(query(bookings, where('uid', '==', uid), where('date', '==', date)), snapshot => {
+    if (!isCurrent()) return;
+    ownLaundry = new Map(snapshot.docs.map(doc => [doc.id, {id: doc.id, ...doc.data()}]));
+    if (visibleLaundrySlots) renderSchedule(visibleLaundrySlots);
+  }, () => {
+    if (!isCurrent()) return;
+    ownLaundry.clear();
+    if (visibleLaundrySlots) renderSchedule(visibleLaundrySlots);
+  });
 }
-async function watch(){
-  if(unsub)unsub();
-  await ensureBadgeUsers();
-  const q=query(collection(db,"bookings"),where("date","==",selectedDate));
-  unsub=onSnapshot(q,s=>renderSchedule(s.docs.map(d=>({id:d.id,...d.data()}))),()=>$("#scheduleGrid").innerHTML='<div class="glass empty">Не удалось загрузить расписание</div>')
-}function multiKey(date,h,m){return `${date}|${h}|${m}`}
+function multiKey(date,h,m){return [date,h,m].join("|")}
 function updateMultiUi(){const t=$("#multiToggle"),n=$("#multiNote"),c=$("#multiConfirm"),count=$("#multiCount");if(!t)return;t.classList.toggle("active",multiMode);t.textContent=multiMode?"Отменить выбор":"Выбрать несколько";n?.classList.toggle("hidden",!multiMode);c?.classList.toggle("hidden",!multiMode);if(count)count.textContent=multiSelected.size;if(c)c.disabled=multiSelected.size===0}
-function publicResidentBadge(b){
-  if(!b||b.uid===me.uid)return "";
-  if(b.booked_by_role==="admin"&&b.booked_for_other!==true)return "";
-  const u=badgeUsersCache.find(x=>x.id===b.uid);
-  return String((u&&u.resident_badge)||b.resident_badge||"").trim();
-}
 function renderSchedule(bs){
   const map=new Map(bs.map(b=>[`${b.start_time}_${b.machine_number}`,b]));
   let o='<div class="schedule"><div></div>'+M.map(m=>`<div class="machine"><svg class="washer-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 8h16"/><circle cx="12" cy="14" r="4"/><circle cx="8" cy="5.5" r=".7"/><circle cx="11" cy="5.5" r=".7"/></svg><span>M${m}</span></div>`).join('');
@@ -2503,13 +2518,10 @@ function renderSchedule(bs){
       const lk=weekend(selectedDate)&&!canWeekend(),sel=multiSelected.has(multiKey(selectedDate,h,m));
       let c='free',t='';
       if(b){
-        const mine=b.uid===me.uid;
-        const adminSelfBooking=b.booked_by_role==='admin'&&b.booked_for_other!==true;
-        const publicAdminBooking=adminSelfBooking&&!mine;
-        c=mine?'mine':(publicAdminBooking?'busy admin-booking-public':'busy');
-        if(recent)c+=' recent-finished';
-        const liveBadge=publicResidentBadge(b);const badge=liveBadge?`<span class="resident-badge">${esc(liveBadge)}</span>`:'';
-        t=recent?(badge||'⌛'):(mine?'Моя':(publicAdminBooking?'<span class="admin-crown">👑</span>':(badge||'Занято')));
+        const mine = ownLaundry.has(b.id);
+        c = mine ? 'mine' : 'busy';
+        if (recent) c += ' recent-finished';
+        t = recent ? '⌛' : (mine ? 'Моя' : 'Занято');
       }else if(ex)c='expired';
       else if(lk){c='locked';t='🔒'}
       if(sel&&!b&&!ex&&!lk)c+=' multi-selected';
@@ -2521,7 +2533,7 @@ function renderSchedule(bs){
   $$('.slot:not(.expired)').forEach(x=>x.onclick=()=>{
     const h=+x.dataset.h,m=+x.dataset.m,raw=map.get(`${pad(h)}:00_${m}`),b=raw&&bookingStillVisible(selectedDate,h)?raw:null;
     if(x.classList.contains('locked'))return toast('Выходные доступны только студсовету');
-    if(b){info(b);animateSheetFrom(x);return}
+    if(b){openLaundrySlot(b,x);return}
     if(cutoff(selectedDate,h))return;
     if(multiMode){
       const k=multiKey(selectedDate,h,m);
@@ -2532,75 +2544,101 @@ function renderSchedule(bs){
   });
   updateMultiUi()
 }
-async function saveMultipleBookings(){if(!multiSelected.size)return;const slots=[...multiSelected].map(k=>{const [date,h,m]=k.split('|');return{date,h:+h,m:+m}}).filter(x=>x.date===selectedDate&&!cutoff(x.date,x.h)&&!(weekend(x.date)&&!canWeekend()));if(!slots.length)return toast('Нет доступных выбранных слотов');try{const current=profile.role==='admin'?0:await countActiveCreatedByMe(),max=profile.role==='student_council'?20:10;if(profile.role!=='admin'&&current+slots.length>max)return toast(`Можно выбрать ещё максимум ${Math.max(0,max-current)} записей`);$("#modal").classList.remove('hidden');$("#sheet").innerHTML=`<h2>Забронировать несколько?</h2><p class="muted">Будет создано записей: ${slots.length}</p><div class="selected-resident"><b>${esc(profile.name)}</b><div class="meta">Комната ${esc(profile.room)}</div></div><div class="sheet-actions"><button id="multiNo" class="secondary">Отмена</button><button id="multiYes" class="primary">Забронировать ${slots.length}</button></div>`;$("#multiNo").onclick=close;$("#multiYes").onclick=async()=>{const btn=$("#multiYes");btn.disabled=true;btn.textContent='Бронируем…';try{await runTransaction(db,async tx=>{const refs=slots.map(x=>doc(db,'bookings',id(x.date,x.h,x.m)));const snaps=[];for(const r of refs)snaps.push(await tx.get(r));if(snaps.some(x=>x.exists()))throw new Error('taken');const target={id:me.uid,name:profile.name,room:profile.room,phone:profile.phone,email:profile.email||me.email||'',resident_badge:profile.resident_badge||''};slots.forEach((x,i)=>tx.set(refs[i],bookingPayload(x.date,x.h,x.m,target)))});multiSelected.clear();multiMode=false;close();updateMultiUi();toast(`Забронировано: ${slots.length}`);refreshNextBooking()}catch(e){console.error('Multiple booking failed:',e);btn.disabled=false;btn.textContent=`Забронировать ${slots.length}`;if(String(e?.message)==='taken')toast('Один из выбранных слотов уже заняли');else if(String(e?.code||'').includes('permission-denied'))toast('Firebase отклонил множественную бронь');else toast('Не удалось выполнить множественную бронь')}}}catch(e){console.error(e);toast('Не удалось проверить лимит записей')}}
-async function countActiveCreatedByMe(){
-  const all=new Map();
-  const q1=await getDocs(query(collection(db,'bookings'),where('booked_by','==',me.uid)));
-  q1.docs.forEach(d=>all.set(d.id,{id:d.id,...d.data()}));
-  const q2=await getDocs(query(collection(db,'bookings'),where('uid','==',me.uid)));
-  q2.docs.forEach(d=>{const b={id:d.id,...d.data()};if(!b.booked_by)all.set(d.id,b)});
-  return [...all.values()].filter(active).length;
-}
-async function checkLimit(){if(profile.role==='admin')return true;const n=await countActiveCreatedByMe(),max=profile.role==='student_council'?20:10;if(n>=max){toast(`Максимум ${max} активных записей`);return false}return true}
+const reserveLaundry = httpsCallable(functions, 'reserveLaundry');
+const cancelLaundry = httpsCallable(functions, 'cancelLaundry');
 function fmt(s){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',weekday:'short'}).format(dateFrom(s))}
-function bookingPayload(date,h,m,target){return{uid:target.id,booked_by:me.uid,booked_by_role:profile.role,booked_for_other:target.id!==me.uid,booking_id:id(date,h,m),date,booking_date:date,start_time:`${pad(h)}:00`,time_code:`${pad(h)}00`,machine_number:m,machine_id:String(m),status:'active',name:target.name,room:target.room,phone:target.phone,email:target.email||'',resident_badge:target.resident_badge||'',created_at:serverTimestamp()}}
-async function saveBooking(date,h,m,target,btn){
-  const reset=()=>{if(btn&&document.body.contains(btn)){btn.disabled=false;btn.textContent='Забронировать';btn.classList.remove('is-loading')}};
-  if(!btn||btn.disabled)return;
-  btn.disabled=true;btn.textContent='Бронируем…';btn.classList.add('is-loading');
-  if(cutoff(date,h)){reset();return toast('Слот уже недоступен')}
-  if(weekend(date)&&!canWeekend()){reset();return toast('Выходные доступны только студсовету')}
-  try{
-    if(!me?.uid) throw new Error('not-authenticated');
-    if(!profile?.name||!profile?.room||!profile?.phone) throw new Error('profile-incomplete');
-    if(!target?.id||!target?.name||!target?.room||!target?.phone) throw new Error('target-incomplete');
-    if(!(await checkLimit())){reset();return}
-    const ref=doc(db,'bookings',id(date,h,m));
-    const payload=bookingPayload(date,h,m,target);
-    await runTransaction(db,async tx=>{
-      const current=await tx.get(ref);
-      if(current.exists())throw new Error('taken');
-      tx.set(ref,payload);
-    });
+async function submitLaundry(slots, targetUid, button, onSuccess) {
+  if (button.disabled) return;
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Бронируем…';
+  try {
+    await reserveLaundry({slots, targetUid});
     close();
-    if(target.id===me.uid)refreshNextBooking();
-    toast(target.id===me.uid?'Машина забронирована':'Житель записан на стирку');
-  }catch(e){
-    console.error('Booking failed:',e);
-    reset();
-    const code=String(e?.code||'');
-    const msg=String(e?.message||'');
-    if(msg==='taken') return toast('Этот слот уже заняли');
-    if(msg==='profile-incomplete') return toast('Сначала заполните ФИО, комнату и телефон в профиле');
-    if(msg==='target-incomplete') return toast('У выбранного жильца не заполнены данные профиля');
-    if(msg==='not-authenticated'||code.includes('unauthenticated')) return toast('Сессия истекла. Войдите в аккаунт заново');
-    if(code.includes('permission-denied')) return toast('Firebase отклонил запись. Обновите правила Firestore');
-    if(code.includes('unavailable')) return toast('Нет связи с Firebase. Попробуйте ещё раз');
-    toast('Не удалось забронировать: '+(code||'неизвестная ошибка'));
+    onSuccess();
+    refreshNextBooking();
+  } catch (error) {
+    console.error('Laundry reservation failed:', error);
+    const messages = {
+      'functions/already-exists': 'Один из выбранных слотов уже заняли',
+      'functions/resource-exhausted': error.message,
+      'functions/permission-denied': 'Нет права оформить эту запись',
+      'functions/failed-precondition': error.message
+    };
+    toast(messages[error.code] || 'Не удалось забронировать. Попробуйте ещё раз.');
+  } finally {
+    if (button.isConnected) {
+      button.disabled = false;
+      button.textContent = label;
+    }
   }
+}
+function saveMultipleBookings() {
+  const slots = [...multiSelected].map(key => {
+    const [date, h, m] = key.split('|');
+    return {date, h: +h, m: +m};
+  }).filter(slot => slot.date === selectedDate && !cutoff(slot.date, slot.h));
+  if (!slots.length) return toast('Нет доступных выбранных слотов');
+  $("#modal").classList.remove('hidden');
+  $("#sheet").innerHTML = '<h2>Забронировать несколько?</h2><p class="muted">Будет создано записей: ' + slots.length + '</p><div class="sheet-actions"><button id="multiNo" class="secondary">Отмена</button><button id="multiYes" class="primary">Забронировать</button></div>';
+  $("#multiNo").onclick = close;
+  $("#multiYes").onclick = event => submitLaundry(slots, me.uid, event.currentTarget, () => {
+    multiSelected.clear();
+    multiMode = false;
+    if (visibleLaundrySlots) renderSchedule(visibleLaundrySlots);
+    updateMultiUi();
+    toast('Забронировано: ' + slots.length);
+  });
+}
+function saveBooking(date, h, m, target, button) {
+  return submitLaundry([{date, h, m}], target.id, button, () => {
+    toast(target.id === me.uid ? 'Машина забронирована' : 'Житель записан на стирку');
+  });
 }
 function ownBookingDialog(date,h,m){
   $('#sheet').innerHTML=`<h2>Бронирование</h2><p class="muted">Машина №${m} · ${fmt(date)}</p><div style="padding:14px;border-radius:18px;background:rgba(255,255,255,.5)"><b>${pad(h)}:00 — ${pad(h+1)}:00</b><br><small>${esc(profile.name)}, комната ${esc(profile.room)}</small></div><div class="sheet-actions"><button id="cCancel" class="secondary">Отмена</button><button id="cSave" class="primary">Забронировать</button></div>`;$('#cCancel').onclick=close;$('#cSave').onclick=()=>saveBooking(date,h,m,{id:me.uid,name:profile.name,room:profile.room,phone:profile.phone,email:profile.email||me.email||''},$('#cSave'));
 }
 async function residentPicker(date,h,m){
   $('#sheet').innerHTML=`<h2>Записать жильца</h2><p class="muted">Машина №${m} · ${fmt(date)} · ${pad(h)}:00–${pad(h+1)}:00</p><label>Найти жильца</label><input id="residentSearch" class="input" type="search" placeholder="Комната 3.3.2 или ФИО" autocomplete="off"><div class="profile-hint">Начните вводить номер комнаты или имя.</div><div id="residentResults" class="resident-search-results"><div class="loader">Загружаем жильцов…</div></div><button id="pickerBack" class="secondary" style="margin-top:12px">Назад</button>`;$('#pickerBack').onclick=()=>create(date,h,m);
-  try{const snap=await getDocs(collection(db,'users'));const users=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.id!==me.uid&&u.role!=='admin');const render=()=>{const q=$('#residentSearch').value.trim().toLowerCase();const found=users.filter(u=>!q||`${u.room||''} ${u.name||''}`.toLowerCase().includes(q)).slice(0,30);$('#residentResults').innerHTML=found.length?found.map(u=>`<button class="resident-result" data-pick="${u.id}"><b>${esc(u.name||'Без имени')}</b><small>Комната ${esc(u.room||'—')} · ${esc(u.phone||'—')}</small></button>`).join(''):'<div class="empty">Никого не нашли</div>';$$('[data-pick]').forEach(b=>b.onclick=()=>confirmResident(date,h,m,users.find(u=>u.id===b.dataset.pick)))};$('#residentSearch').oninput=render;render()}catch(e){$('#residentResults').innerHTML='<div class="empty">Не удалось загрузить жильцов</div>'}
+  try{const snap=await getDocs(collection(db,'users'));const users=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.id!==me.uid&&u.role!=='admin');const render=()=>{const q=$('#residentSearch').value.trim().toLowerCase();const found=users.filter(u=>!q||`${u.room||''} ${u.name||''}`.toLowerCase().includes(q)).slice(0,30);$('#residentResults').innerHTML=found.length?found.map(u=>`<button class="resident-result" data-pick="${u.id}"><b>${esc(u.name||'Без имени')}</b><small>Комната ${esc(u.room||'—')}</small></button>`).join(''):'<div class="empty">Никого не нашли</div>';$$('[data-pick]').forEach(b=>b.onclick=()=>confirmResident(date,h,m,users.find(u=>u.id===b.dataset.pick)))};$('#residentSearch').oninput=render;render()}catch(e){$('#residentResults').innerHTML='<div class="empty">Не удалось загрузить жильцов</div>'}
 }
-function confirmResident(date,h,m,u){if(!u)return;$('#sheet').innerHTML=`<h2>Подтвердите запись</h2><p class="muted">Машина №${m} · ${fmt(date)} · ${pad(h)}:00–${pad(h+1)}:00</p><div class="selected-resident"><b>${esc(u.name||'Без имени')}</b><div class="meta">Комната ${esc(u.room||'—')} · ${esc(u.phone||'—')}</div></div><div class="limit-note">Эта запись учитывается в лимите того, кто её оформляет.</div><div class="sheet-actions"><button id="residentBack" class="secondary">Назад</button><button id="cSave" class="primary">Забронировать</button></div>`;$('#residentBack').onclick=()=>residentPicker(date,h,m);$('#cSave').onclick=()=>saveBooking(date,h,m,u,$('#cSave'))}
+function confirmResident(date,h,m,u){if(!u)return;$('#sheet').innerHTML=`<h2>Подтвердите запись</h2><p class="muted">Машина №${m} · ${fmt(date)} · ${pad(h)}:00–${pad(h+1)}:00</p><div class="selected-resident"><b>${esc(u.name||'Без имени')}</b><div class="meta">Комната ${esc(u.room||'—')}</div></div><div class="limit-note">Эта запись учитывается в лимите того, кто её оформляет.</div><div class="sheet-actions"><button id="residentBack" class="secondary">Назад</button><button id="cSave" class="primary">Забронировать</button></div>`;$('#residentBack').onclick=()=>residentPicker(date,h,m);$('#cSave').onclick=()=>saveBooking(date,h,m,u,$('#cSave'))}
 function create(date,h,m){
-  $('#modal').classList.remove('hidden');const canForOther=profile.role==='admin'||(profile.role==='student_council'&&weekend(date));
+  $('#modal').classList.remove('hidden');const canForOther=profile.role==='admin'||(profile.role==='student_council'&&canViewStudents()&&weekend(date));
   if(!canForOther)return ownBookingDialog(date,h,m);
   $('#sheet').innerHTML=`<h2>Кого записываем?</h2><p class="muted">Машина №${m} · ${fmt(date)} · ${pad(h)}:00–${pad(h+1)}:00</p><div class="choice-grid"><button id="bookSelf" class="choice-card">Себя</button><button id="bookOther" class="choice-card">Жильца</button></div>${profile.role==='student_council'?'<div class="limit-note">Лимит студсовета: 20 активных записей, включая записи за других.</div>':'<div class="limit-note">Для администратора лимита нет.</div>'}<button id="choiceCancel" class="secondary" style="margin-top:12px">Отмена</button>`;$('#bookSelf').onclick=()=>ownBookingDialog(date,h,m);$('#bookOther').onclick=()=>residentPicker(date,h,m);$('#choiceCancel').onclick=close;
 }
-function info(b){
-  const mine=b.uid===me.uid,createdByMe=(b.booked_by||b.uid)===me.uid;
-  const liveBadge=publicResidentBadge(b);const badge=liveBadge?` <span class="resident-badge-inline">${esc(liveBadge)}</span>`:'';
-  const h=parseInt(String(b.start_time||"").slice(0,2),10),finished=Number.isFinite(h)&&bookingRecentlyFinished(b.date,h);
-  $("#modal").classList.remove("hidden");
-  $("#sheet").innerHTML=`<h2>${mine?'Моя запись':'Машина занята'}${finished?' · завершена':''}</h2><p class="muted">Машина №${b.machine_number} · ${fmt(b.date)}${finished?' · время стирки уже закончилось':''}</p><div style="padding:14px;border-radius:18px;background:rgba(255,255,255,.5)"><div class="menu"><span>Время</span><b>${b.start_time}–${pad(+b.start_time.slice(0,2)+1)}:00</b></div><div class="menu"><span>Имя</span><b>${esc(b.name)}${badge}</b></div><div class="menu"><span>Комната</span><b>${esc(b.room)}</b></div><div class="menu"><span>Телефон</span><b>${esc(b.phone)}</b></div></div><div class="sheet-actions"><a class="secondary" style="text-align:center;text-decoration:none" href="tel:${esc(b.phone)}">Позвонить</a>${mine||createdByMe||profile.role==='admin'?'<button id="cancelBooking" class="secondary">Отменить</button>':'<button id="infoClose" class="secondary">Закрыть</button>'}</div>`;
-  if($("#infoClose"))$("#infoClose").onclick=close;
-  if($("#cancelBooking"))$("#cancelBooking").onclick=()=>cancelBooking(b)
-}function cancelBooking(b){
+function openLaundrySlot(slot, source) {
+  const own = ownLaundry.get(slot.id);
+  const modal = $("#modal"), sheet = $("#sheet");
+  const time = esc(slot.start_time) + '–' + pad(+slot.start_time.slice(0,2)+1) + ':00';
+  const details = document.createElement('div');
+  modal.classList.remove('hidden');
+  sheet.innerHTML = '<h2>' + (own ? 'Моя запись' : 'Машина занята') + '</h2><p class="muted">Машина №' + esc(slot.machine_number) + ' · ' + esc(fmt(slot.date)) + ' · ' + time + '</p>';
+  sheet.append(details);
+  const show = booking => {
+    if (!details.isConnected) return;
+    const mine = booking?.uid === me?.uid;
+    if (mine) sheet.querySelector('h2').textContent = 'Моя запись';
+    const identity = booking && !mine
+      ? '<div class="selected-resident"><b>' + esc(booking.name) + '</b><div class="meta">Комната ' + esc(booking.room) + '</div></div>'
+      : '';
+    details.innerHTML = identity + '<div class="sheet-actions"><button class="secondary" data-laundry-close>Закрыть</button>' +
+      (booking ? '<button class="secondary" data-laundry-cancel>Отменить запись</button>' : '') + '</div>';
+    details.querySelector('[data-laundry-close]').onclick = close;
+    if (booking) details.querySelector('[data-laundry-cancel]').onclick = () => cancelBooking(booking);
+  };
+  show(own);
+  animateSheetFrom(source);
+  if (!own && ['admin', 'student_council'].includes(profile.role)) {
+    getDoc(doc(db, 'bookings', slot.id)).then(snapshot => {
+      if (snapshot.exists()) show({id: snapshot.id, ...snapshot.data()});
+    }).catch(error => {
+      if (error.code !== 'permission-denied') console.error('Laundry details unavailable:', error);
+    });
+  }
+}
+function cancelBooking(b){
   const bookingId=b.id||b.booking_id||id(b.date,+b.start_time.slice(0,2),b.machine_number);
   $("#modal").classList.remove("hidden");
   $("#modal").classList.add("confirm-cancel-mode");
@@ -2618,25 +2656,18 @@ function info(b){
     $("#cancelYes").disabled=true;
     $("#cancelYes").textContent="Отменяем…";
     try{
-      const batch=writeBatch(db);
-      const historyRef=doc(collection(db,'booking_history'));
-      batch.set(historyRef,{
-        ...b,
-        history_id:historyRef.id,
-        booking_id:bookingId,
-        status:'cancelled',
-        cancelled_by:me.uid,
-        cancelled_at:serverTimestamp()
-      });
-      batch.delete(doc(db,'bookings',bookingId));
-      await batch.commit();
+      const createdAt = b.created_at;
+      const revision = createdAt ? `${createdAt.seconds}:${createdAt.nanoseconds}` : null;
+      await cancelLaundry({id: bookingId, revision});
       close();
       toast('Запись отменена');refreshNextBooking();
       if(!$("#myPage").classList.contains('hidden'))loadMy();
     }catch(e){
       $("#cancelYes").disabled=false;
       $("#cancelYes").textContent="Да, отменить";
-      toast('Не удалось отменить запись');
+      toast(e.code === 'functions/failed-precondition' || e.code === 'functions/not-found'
+        ? 'Запись изменилась. Откройте её заново.'
+        : 'Не удалось отменить запись');
     }
   };
 }async function loadMy(){$("#myBookings").innerHTML='<div class="loader">Загружаем…</div>';try{const s=await getDocs(query(collection(db,'bookings'),where('uid','==',me.uid))),a=s.docs.map(d=>({id:d.id,...d.data()})).filter(active).sort((a,b)=>(a.date+a.start_time).localeCompare(b.date+b.start_time));$("#myBookings").innerHTML=a.length?a.map(b=>`<div class="glass item"><div class="row"><div><div class="item-title">Машина №${b.machine_number}</div><div class="meta">${fmt(b.date)} · ${b.start_time}–${pad(+b.start_time.slice(0,2)+1)}:00</div></div><span class="status">Активна</span></div><button class="small" data-cancel="${b.id}" style="margin-top:12px">Отменить</button></div>`).join(''):'<div class="glass empty">Активных записей пока нет</div>';$$('[data-cancel]').forEach(x=>x.onclick=()=>cancelBooking(a.find(b=>b.id===x.dataset.cancel)))}catch(e){$("#myBookings").innerHTML='<div class="glass empty">Не удалось загрузить записи</div>'}}
@@ -2803,8 +2834,6 @@ function renderAdminUsers(){
       try{
         await updateDoc(doc(db,"users",user.id),{resident_badge:badge,updated_at:serverTimestamp()});
         user.resident_badge=badge;
-        const cu=badgeUsersCache.find(x=>x.id===user.id);
-        if(cu)cu.resident_badge=badge; else badgeUsersCache.push({...user});
         renderAdminUsers();
         toast(badge?"Значок сохранён":"Значок убран");
       }catch(e){console.error(e);toast("Не удалось сохранить значок")}
@@ -2863,14 +2892,14 @@ async function adminHistory(){
     const [s,liveUsers]=await Promise.all([getDocs(query(collection(db,"booking_history"),orderBy("cancelled_at","desc"),limit(100))),getDocs(collection(db,"users"))]);
     const liveIds=new Set(liveUsers.docs.map(d=>d.id));
     const entries=s.docs.map(d=>({id:d.id,...d.data()})).filter(b=>liveIds.has(b.uid));
-    $("#adminHistory").innerHTML=entries.length?entries.map((b,i)=>`<button class="glass item history-entry" type="button" data-history-index="${i}"><div class="item-title">${esc(fmt(b.date))} · ${esc(b.start_time||"—")} · машина №${esc(b.machine_number||"—")}</div><div class="meta">${esc(b.name||"—")} · комната ${esc(b.room||"—")} · ${esc(b.phone||"—")}<br>Статус: отменено</div></button>`).join(""):'<div class="glass empty">История пока пустая</div>';
+    $("#adminHistory").innerHTML=entries.length?entries.map((b,i)=>`<button class="glass item history-entry" type="button" data-history-index="${i}"><div class="item-title">${esc(fmt(b.date))} · ${esc(b.start_time||"—")} · машина №${esc(b.machine_number||"—")}</div><div class="meta">${esc(b.name||"—")} · комната ${esc(b.room||"—")}<br>Статус: отменено</div></button>`).join(""):'<div class="glass empty">История пока пустая</div>';
     $$('[data-history-index]').forEach(button=>button.onclick=()=>{
       const b=entries[Number(button.dataset.historyIndex)];if(!b)return;
       const cancelled=b.cancelled_at?.toDate?.();
       const cancelledText=cancelled?new Intl.DateTimeFormat("ru-RU",{dateStyle:"long",timeStyle:"short"}).format(cancelled):"—";
       const end=b.end_time||(/^\d{1,2}:\d{2}$/.test(String(b.start_time||""))?`${pad(Number(b.start_time.slice(0,2))+1)}:00`:"—");
       $("#modal").classList.remove("hidden");
-      $("#sheet").innerHTML=`<h2>История записи</h2><div class="user-detail-grid"><div class="user-detail-field full"><span>Жилец</span><b>${esc(b.name||"—")}</b></div><div class="user-detail-field"><span>Комната</span><b>${esc(b.room||"—")}</b></div><div class="user-detail-field"><span>Телефон</span><b>${esc(b.phone||"—")}</b></div><div class="user-detail-field"><span>Дата стирки</span><b>${esc(fmt(b.date))}</b></div><div class="user-detail-field"><span>Время</span><b>${esc(b.start_time||"—")}–${esc(end)}</b></div><div class="user-detail-field"><span>Машина</span><b>№${esc(b.machine_number||"—")}</b></div><div class="user-detail-field"><span>Статус</span><b>Отменено</b></div><div class="user-detail-field full"><span>Время отмены</span><b>${esc(cancelledText)}</b></div></div><div class="sheet-actions"><button id="historyDetailClose" class="secondary" type="button">Закрыть</button></div>`;
+      $("#sheet").innerHTML=`<h2>История записи</h2><div class="user-detail-grid"><div class="user-detail-field full"><span>Жилец</span><b>${esc(b.name||"—")}</b></div><div class="user-detail-field"><span>Комната</span><b>${esc(b.room||"—")}</b></div><div class="user-detail-field"><span>Дата стирки</span><b>${esc(fmt(b.date))}</b></div><div class="user-detail-field"><span>Время</span><b>${esc(b.start_time||"—")}–${esc(end)}</b></div><div class="user-detail-field"><span>Машина</span><b>№${esc(b.machine_number||"—")}</b></div><div class="user-detail-field"><span>Статус</span><b>Отменено</b></div><div class="user-detail-field full"><span>Время отмены</span><b>${esc(cancelledText)}</b></div></div><div class="sheet-actions"><button id="historyDetailClose" class="secondary" type="button">Закрыть</button></div>`;
       animateSheetFrom(button);$("#historyDetailClose").onclick=close;
     });
   }catch(e){console.error("Admin booking history failed:",e);$("#adminHistory").innerHTML='<div class="glass empty">Не удалось загрузить историю</div>'}
@@ -2917,7 +2946,10 @@ $$('[data-admin]').forEach(x=>x.onclick=()=>{
 }$$('.nav').forEach(x=>x.onclick=()=>page(x.dataset.page));onAuthStateChanged(auth,async u=>{
   if(!u){
     me=profile=null;
-    if(unsub)unsub();
+    unsub?.();
+    stopOwnLaundry?.();
+    ownLaundry.clear();
+    visibleLaundrySlots = null;
     $("#appView").classList.add('hidden');
     $("#authView").classList.remove('hidden');
     document.body.classList.remove('auth-pending');
@@ -3225,9 +3257,17 @@ function reasonDialog(r=null){const editing=!!r;$("#modal").classList.remove("hi
 
 
 
-if($("#multiToggle"))$("#multiToggle").onclick=()=>{multiMode=!multiMode;if(!multiMode)multiSelected.clear();updateMultiUi();watch()};
+if($("#multiToggle"))$("#multiToggle").onclick=()=>{multiMode=!multiMode;if(!multiMode)multiSelected.clear();updateMultiUi();if(visibleLaundrySlots)renderSchedule(visibleLaundrySlots)};
 if($("#multiConfirm"))$("#multiConfirm").onclick=saveMultipleBookings;
-setInterval(()=>{if(me&&selectedDate){renderDates();watch()}},60000);
+setInterval(()=>{
+  if(!me || !profile || !selectedDate) return;
+  const previousDate = selectedDate;
+  renderDates();
+  if(selectedDate !== previousDate) {
+    multiSelected.clear();
+    watch();
+  } else if(visibleLaundrySlots) renderSchedule(visibleLaundrySlots);
+},60000);
 
 // Reveal newly loaded content without animating every cell in the schedule.
 const motionPreference=window.matchMedia("(prefers-reduced-motion: reduce)");

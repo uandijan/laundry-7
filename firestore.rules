@@ -91,22 +91,20 @@ service cloud.firestore {
     }
 
     match /bookings/{bookingId} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.booked_by == request.auth.uid
-        && (request.resource.data.uid == request.auth.uid || isAdmin() || isCouncil());
-      allow update: if false;
-      allow delete: if signedIn() && (
-        isAdmin() || resource.data.uid == request.auth.uid
-        || resource.data.booked_by == request.auth.uid
+      allow read: if signedIn() && (
+        resource.data.uid == request.auth.uid
+        || isAdmin()
+        || (isCouncil() && resource.data.get('booked_by', '') == request.auth.uid)
       );
+      allow write: if false;
+    }
+    match /laundry_slots/{slotId} {
+      allow read: if signedIn();
+      allow write: if false;
     }
     match /booking_history/{historyId} {
       allow read: if isAdmin();
-      allow create: if signedIn() && (
-        isAdmin() || request.resource.data.uid == request.auth.uid
-        || request.resource.data.booked_by == request.auth.uid
-      );
+      allow create: if false;
       allow update: if false;
       allow delete: if isAdmin()
         && resource.data.uid is string
