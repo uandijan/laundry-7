@@ -18,6 +18,16 @@ async function removeMatching(collection, field, uid) {
   }
 }
 
+async function anonymizeMatching(collection, field, uid, patch) {
+  while (true) {
+    const snap = await db.collection(collection).where(field, '==', uid).limit(300).get();
+    if (snap.empty) return;
+    const batch = db.batch();
+    for (const item of snap.docs) batch.update(item.ref, patch);
+    await batch.commit();
+  }
+}
+
 async function eraseStudent(uid) {
   const marker = db.doc(`deleted_users/${uid}`);
   await marker.set({status: 'deleting', updated_at: FieldValue.serverTimestamp()}, {merge: true});
@@ -28,15 +38,38 @@ async function eraseStudent(uid) {
 
   for (const collection of ['bookings', 'booking_history']) {
     await removeMatching(collection, 'uid', uid);
-    await removeMatching(collection, 'booked_by', uid);
+    await anonymizeMatching(collection, 'booked_by', uid, {
+      booked_by: FieldValue.delete(), booked_by_role: FieldValue.delete()
+    });
   }
+  await anonymizeMatching('booking_history', 'cancelled_by', uid, {
+    cancelled_by: FieldValue.delete()
+  });
   for (const collection of ['brs_transactions', 'brs_audit', 'brs_view']) {
     await removeMatching(collection, 'student_uid', uid);
+  }
+  await anonymizeMatching('brs_audit', 'created_by', uid, {
+    created_by: FieldValue.delete(), created_by_name: FieldValue.delete(),
+    created_by_role: FieldValue.delete()
+  });
+  for (const collection of ['brs_audit', 'brs_transactions']) {
+    await anonymizeMatching(collection, 'cancelled_by', uid, {
+      cancelled_by: FieldValue.delete(), cancelled_by_name: FieldValue.delete()
+    });
   }
 
   // Copies of a resident's operations may belong to multiple BRS managers.
   const managers = await db.collection('brs_manager_ops').listDocuments();
   for (const manager of managers) {
+    while (true) {
+      const snap = await manager.collection('items').where('cancelled_by', '==', uid).limit(300).get();
+      if (snap.empty) break;
+      const batch = db.batch();
+      for (const item of snap.docs) batch.update(item.ref, {
+        cancelled_by: FieldValue.delete(), cancelled_by_name: FieldValue.delete()
+      });
+      await batch.commit();
+    }
     while (true) {
       const snap = await manager.collection('items').where('student_uid', '==', uid).limit(300).get();
       if (snap.empty) break;
@@ -56,13 +89,23 @@ async function eraseStudent(uid) {
         throw new Error(`Remaining ${collection} record`);
     }
   }
+  if (!(await db.collection('booking_history').where('cancelled_by', '==', uid).limit(1).get()).empty)
+    throw new Error('Remaining booking cancellation author');
   for (const collection of ['brs_transactions', 'brs_audit', 'brs_view']) {
     if (!(await db.collection(collection).where('student_uid', '==', uid).limit(1).get()).empty)
       throw new Error(`Remaining ${collection} record`);
   }
+  if (!(await db.collection('brs_audit').where('created_by', '==', uid).limit(1).get()).empty)
+    throw new Error('Remaining BRS author');
+  for (const collection of ['brs_audit', 'brs_transactions']) {
+    if (!(await db.collection(collection).where('cancelled_by', '==', uid).limit(1).get()).empty)
+      throw new Error(`Remaining ${collection} cancellation author`);
+  }
   for (const manager of managers) {
     if (!(await manager.collection('items').where('student_uid', '==', uid).limit(1).get()).empty)
       throw new Error('Remaining manager record');
+    if (!(await manager.collection('items').where('cancelled_by', '==', uid).limit(1).get()).empty)
+      throw new Error('Remaining manager cancellation author');
   }
   await marker.set({status: 'complete', completed_at: FieldValue.serverTimestamp()}, {merge: true});
 }
